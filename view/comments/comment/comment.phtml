@@ -1,0 +1,35 @@
+<div class="comment-wrapper">
+    <div>
+        <span class="comment-discriptor-label"><?= $this->translate('Title') ?> : </span>
+        <span class="module-comments-title"><strong><?= $this->EscapeHtml($comment->getTitle()) ?></strong> </span>
+    </div>
+    <div> 
+        <span class="comment-discriptor-label"><?= $this->translate('Username') ?> : </span>
+        <span class="module-comments-username"><strong><?= $this->EscapeHtml($comment->getUser()->getUserName()) ?></strong> </span>
+    </div>
+    <div>
+        <span class="module-comments-comment"><?= $this->EscapeHtml($comment->getComment()) ?> </span>
+    </div> 
+
+    <div class="child-comments-wrapper" parent-id="<?= $comment->getId() ?>">
+    <div class="child-comments" >
+        <?php 
+        //loop the child comments 
+        foreach ($comment->getChildren() as $childComment) {
+            echo $this->partial('zf-module/comment/child-comment.phtml', array('comment' => $childComment));
+        }
+        ?>
+    </div><!-- end - class="child-comments"-->
+
+    <span class="show-hide-child-comments-button comment-button"><?= $this->translate('Show Replies') ?></span>
+    <span> || </span>
+    <span class="reply-to-comment-button comment-button"><?= $this->translate('Reply') ?></span>
+    <?php if ($this->zfcUserIdentity() || 1) { ?>
+    <?=  $this->renderChildModel('replyForm') ?>
+       
+    <?php } else { ?>
+        <a><?= $this->translate('Login to reply') ?></a>
+<?php } // end else  ?>
+    <hr>
+    </div><!-- end - class="child-comments-wrapper" -->
+</div><!-- end - class="comment-wrapper" -->

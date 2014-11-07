@@ -1,0 +1,30 @@
+<?php
+if (!$this->replacementForm) {
+    $form = $this->replyForm;
+} else {
+     $form = $this->replacementForm;
+}
+$comment = $this->comment;
+$parentId = $this->parentId;
+$form->setAttribute('action', $this->url("comment/add-reply"));
+$form->setAttribute('method', 'post');
+
+$form->prepare();
+?>
+<form action="/comment/add-reply" method="post" class="reply-to-comment-form">
+    
+    <div class="element-wrapper">
+        <input type="hidden" name="parent-id" value="<?php $parentId ?>" >
+    </div><!-- end - class="input-wrapper"-->
+    <?php ?>
+  
+   
+    <div class="element-wrapper">
+        <?= $this->formRow($form->get('comment')); ?>
+    </div><!-- end - class="input-wrapper"-->
+    
+    <div class="element-wrapper">
+         <?= $this->formSubmit($form->get('submit')); ?>
+    </div><!-- end - class="input-wrapper"-->
+
+</form>
