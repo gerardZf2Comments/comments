@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfModule\View\Model;
+namespace Comments\View\Model;
 
 use Zend\View\Model\ViewModel;
 /**

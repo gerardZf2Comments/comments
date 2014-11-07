@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfModule\Mapper\Exception;
+namespace Comments\Mapper\Exception;
 
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {}

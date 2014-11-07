@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfModule\View\Helper;
+namespace Comments\View\Helper;
 
 
 use Zend\View\Helper\AbstractHelper;
@@ -41,8 +41,8 @@ class Comments extends AbstractHelper implements ServiceLocatorAwareInterface
         ));
         $vm->setTemplate('zf-module/comment/comments.phtml');
         
-        $commentForm = $this->getServiceLocator()->getServiceLocator()->get('zfmodule_view_model_comment_form');
-        $replyForm = $this->getServiceLocator()->getServiceLocator()->get('zfmodule_view_model_comment_reply_form');
+        $commentForm = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_form');
+        $replyForm = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_reply_form');
         $commentForm->setVariable('moduleId', $moduleId);
         $vm->addChild($commentForm, 'commentForm');
         $vm->addChild($replyForm, 'replyForm');
@@ -55,7 +55,7 @@ class Comments extends AbstractHelper implements ServiceLocatorAwareInterface
     }
     /**
      * 
-     * @return \ZfModule\Service\Comment
+     * @return \Comments\Service\Comment
      */
     public function getCommentService(){
         return $this->commentService;

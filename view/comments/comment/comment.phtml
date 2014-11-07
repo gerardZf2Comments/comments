@@ -16,7 +16,7 @@
         <?php 
         //loop the child comments 
         foreach ($comment->getChildren() as $childComment) {
-            echo $this->partial('zf-module/comment/child-comment.phtml', array('comment' => $childComment));
+            echo $this->partial('comments/comment/child-comment.phtml', array('comment' => $childComment));
         }
         ?>
     </div><!-- end - class="child-comments"-->

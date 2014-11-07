@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfModule\Service\Exception;
+namespace Comments\Service\Exception;
 
 interface ExceptionInterface
 {

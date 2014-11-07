@@ -1,10 +1,10 @@
 <?php
 
-namespace ZfModule\Mapper;
+namespace Comments\Mapper;
 
 use Doctrine\ORM\EntityManager;
 use ZfModule\Mapper\Module as Module;
-use ZfModule\Options\ModuleOptions;
+use Comments\Options\CommentOptions;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 
 /**
@@ -22,24 +22,24 @@ class Comment
     
     /**
      * to be set in factory
-     * @var \ZfcUserDoctrineORM\Options\ModuleOptions
+     * @var \Comments\Options\CommentOptions
      */
     protected $options;
 
     /**
      * some params required
      * @param \Doctrine\ORM\EntityManager $em
-     * @param \ZfModule\Options\ModuleOptions $options
+     * @param \Comments\Options\CommentOptions $options
      */
-    public function __construct(EntityManager $em, ModuleOptions $options) 
+    public function __construct(EntityManager $em, CommentOptions $options) 
     {
         $this->em = $em;
         $this->options = $options;
     }
     /**
      * write to db here 
-     * @param \ZfModule\Entity\Comment $entity
-     * @return \ZfModule\Entity\Comment
+     * @param \Comments\Entity\Comment $entity
+     * @return \Comments\Entity\Comment
      */
     public function insert($entity) 
     {
@@ -47,16 +47,16 @@ class Comment
     }
      /**
      * write to db here 
-     * @param \ZfModule\Entity\Comment $entity
-     * @return \ZfModule\Entity\Comment
+     * @param \Comments\Entity\Comment $entity
+     * @return \Comments\Entity\Comment
      */
     public function update($entity) {
         return $this->persist($entity);
     }
      /**
      * write to db here 
-     * @param \ZfModule\Entity\Comment $entity
-     * @return \ZfModule\Entity\Comment
+     * @param \Comments\Entity\Comment $entity
+     * @return \Comments\Entity\Comment
      */
     protected function persist($entity) {
         $this->em->persist($entity);
@@ -66,7 +66,7 @@ class Comment
     }
      /**
      * Removes an entity
-     * @param \ZfModule\Entity\Comment $entity
+     * @param \Comments\Entity\Comment $entity
      * @throws ORMInvalidArgumentException
      */
     public function delete($entity)
@@ -77,7 +77,7 @@ class Comment
 
     /**
      * fire events for listeners
-     * @param  \ZfModule\Entity\Comment $entity
+     * @param  \Comments\Entity\Comment $entity
      * @todo implement this
      */
     protected function postRead($result)
@@ -94,7 +94,7 @@ class Comment
         $qb = $this->em->createQueryBuilder();
        
         $qb->add('select', 'c')
-           ->add('from', "ZfModule\Entity\Comment c $columns");
+           ->add('from', "Comments\Entity\Comment c $columns");
         
         return $qb;
     }
@@ -170,7 +170,7 @@ class Comment
         $qb = $this->em->createQueryBuilder();
        
        $qb->add('select', 'c')
-                  ->add('from', "ZfModule\Entity\Comment c");
+                  ->add('from', "Comments\Entity\Comment c");
     
         if ($orderBy) {
             $qb->orderBy('c.'.$orderBy , $sort); 

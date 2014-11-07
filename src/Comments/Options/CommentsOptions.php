@@ -1,16 +1,16 @@
 <?php
 
-namespace ZfModule\Options;
+namespace Comments\Options;
 
 use Zend\Stdlib\AbstractOptions;
 
 /**
- * Description of ModuleOptions
+ * Description of CommentOptions
  *@todo review posibility of mering with general config
  *@todo pretty sure the abstract class uses classmethods to hydrate from array
  * @author gerard
  */
-class ModuleOptions extends AbstractOptions 
+class CommentOptions extends AbstractOptions 
 {
 
     /**
@@ -50,7 +50,7 @@ class ModuleOptions extends AbstractOptions
     /**
      * the class to be instanciated for comments 
      * @param string $className
-     * @return \ZfModule\Options\ModuleOptions
+     * @return \Comments\Options\CommentOptions
      */
     public function setCommentEntityClassName($className)
     {
@@ -69,7 +69,7 @@ class ModuleOptions extends AbstractOptions
     /**
      * the class to be instanciated for users
      * @param string $className
-     * @return \ZfModule\Options\ModuleOptions
+     * @return \Comments\Options\CommentOptions
      */
     public function setUserEntityClassName($className)
     {
@@ -88,9 +88,10 @@ class ModuleOptions extends AbstractOptions
         return $this->commentEntityClass;
     }
     /**
+     * todo-remove
      * the class to be instanciated for comments
      * @param string $className
-     * @return \ZfModule\Options\ModuleOptions
+     * @return \Comments\Options\CommentOptions
      */
     public function setModuleEntityClass($className) 
     {
@@ -116,7 +117,7 @@ class ModuleOptions extends AbstractOptions
     /**
      * the template to be used to render exceptions
      * @param string $templateName
-     * @return \ZfModule\Options\ModuleOptions
+     * @return \Comments\Options\CommentOptions
      */
     public function setViewExceptionTemplateName($templateName)
     {
@@ -127,7 +128,7 @@ class ModuleOptions extends AbstractOptions
     /**
       * the class to be instanciated for tag entities 
      * @param string $string
-     * @return \ZfModule\Options\ModuleOptions
+     * @return \Comments\Options\CommentOptions
      */
     public function setTagEntityClassName($className) 
     {
@@ -143,34 +144,5 @@ class ModuleOptions extends AbstractOptions
         return $this->tagEntityClass = $string;
     }
 
-    /**
-     * base path with /tag appended
-     * @return string
-     */
-    public function getTagIndexPath() 
-    {
-        return $this->getBaseSearchIndexPath() . '/tag';
-    }
-    /**
-     * base path with /module appended
-     * @return string
-     */
-    public function getModuleIndexPath() 
-    {
-        return $this->getBaseSearchIndexPath() . '/module';
-    }
-    /**
-     * jumping around directories like an idiot is better than recursively scaning them me thinks
-     * @return string
-     */
-    public function getBaseSearchIndexPath()
-    {
-        $path = dirname(__FILE__); // should be /zfmodule/src/zfmodules/options
-        $path .= '/../../../../../'; //go back
-        $path .= 'data/search';
-        
-        return $path;
-    }
+   
 }
-
-?>

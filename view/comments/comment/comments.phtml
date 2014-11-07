@@ -14,7 +14,7 @@
     if (count($comments)) {
         //loop to display comments
         foreach ($comments as $key => $comment) {
-            echo $this->partial('zf-module/comment/comment.phtml',
+            echo $this->partial('comments/comment/comment.phtml',
                                 array('comment' => $comment , 'moduleId' => $moduleId));
             ?>
 

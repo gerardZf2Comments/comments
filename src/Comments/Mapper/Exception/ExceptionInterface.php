@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfModule\Mapper\Exception;
+namespace Comments\Mapper\Exception;
 
 use ZfcBase\Mapper\Exception\ExceptionInterface as Exception;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace ZfModule\Service;
+namespace Comments\Service;
 
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -28,7 +28,7 @@ class Comment {
         $title = (string)$title;
         // WTF
         $user = $this->getUserById($userId);
-         /** @var \ZfModule\Entity\Comment */
+         /** @var \Comments\Entity\Comment */
         $commentEntity = $this->getCommentEntity();
        // $parent = $this->getCommentEntity();
         $userId = $user->getId();
@@ -61,7 +61,7 @@ class Comment {
                                   $parentCommentId);
         $moduleId = $parentComment->getModuleId();
         $user = $em->find('User\Entity\User', $userId);
-        /** @var \ZfModule\Entity\Comment */
+        /** @var \Comments\Entity\Comment */
         $commentEntity = $this->getCommentEntity();
         $userId = $user->getId();
         $commentEntity->setUser($user);
@@ -89,7 +89,7 @@ class Comment {
         $commentId = (int) $commentId;
         $comment = (int) $comment;
        
-        /** @var \ZfModule\Entity\Comment */
+        /** @var \Comments\Entity\Comment */
         $commentEntity = $this->getCommentMapper()->find($commentId);
         if(!$commentEntity){
             throw new Exception;
@@ -142,7 +142,7 @@ class Comment {
     /**
      * 
      * @param \Zend\ServiceManager\ServiceLocatorInterface $sm
-     * @return \ZfModule\Service\Search\ModuleSearch
+     * @return $this
      */
     public function setServiceLocator(ServiceLocatorInterface $sm) 
     {
@@ -151,21 +151,21 @@ class Comment {
     }
     /**
      * 
-     * @return \ZfModule\Mapper\Comment
+     * @return \Comments\Mapper\Comment
      */
     public function getCommentMapper()
     {
-        return $this->getServiceLocator()->get('zfmodule_mapper_comment');
+        return $this->getServiceLocator()->get('comments_mapper_comment');
         
     }
 
     /**
      * 
-     * @return \ZfModule\Entity\Comment
+     * @return \Comments\Entity\Comment
      */
     public function getCommentEntity()
     {
-        return $this->getServiceLocator()->get('zfmodule_entity_comment');
+        return $this->getServiceLocator()->get('comments_entity_comment');
     }
      /**
      * 
