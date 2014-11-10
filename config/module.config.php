@@ -16,7 +16,7 @@ return array(
                 'drivers' => array(
                     // register `my_annotation_driver` for any entity under namespace `My\Namespace`
                     
-                    'ZfModule\Entity\Comment'  => 'zfmodule_entity_comment',
+                    'Comments\Entity\Comment'  => 'comments_entity_comment',
                     
                 )
             ),
@@ -26,7 +26,7 @@ return array(
     'controllers' => array(
         'invokables' => array(
         
-            'ZfModule\Controller\Comment' => 'ZfModule\Controller\CommentController',
+            'Comments\Controller\Comment' => 'Comments\Controller\CommentController',
             
         ),
         'aliases' => array(
@@ -74,7 +74,7 @@ return array(
                 'options' => array (
                     'route' => '/comment',
                     'defaults' => array(
-                        'controller' => 'ZfModule\Controller\Comment',
+                        'controller' => 'Comments\Controller\Comment',
                         'action' => 'list',
                     ),
                 ),
@@ -135,14 +135,8 @@ return array(
 
     'view_helpers' => array(
         'invokables' => array(
-            /**
-            'newModule' => 'ZfModule\View\Helper\NewModule',
-            'listModule' => 'ZfModule\View\Helper\ListModule',
-            'moduleView' => 'ZfModule\View\Helper\ModuleView',
-            'moduleDescription' => 'ZfModule\View\Helper\ModuleDescription',
-             * 
-             */
-        ),
+            
+            ),
         
     ),
     

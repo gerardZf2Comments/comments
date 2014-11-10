@@ -10,8 +10,27 @@
 
 namespace Comments;
 
-Class Module 
+Class Module
 {
+    /**
+     * return include __DIR__ . '/config/module.config.php';
+     * @return array
+     */
+    public function getConfig()
+    {
+        return include __DIR__ . '/config/module.config.php';
+    }
+        public function getAutoloaderConfig() {
+        return array(
+            
+            'Zend\Loader\StandardAutoloader' => array(
+                'namespaces' => array(
+                    // if we're in a namespace deeper than one level we need to fix the \ in the path
+                    __NAMESPACE__ => __DIR__ . '/src/' . str_replace('\\', '/', __NAMESPACE__),
+                ),
+            ),
+        );
+    }
      /**
      * description
      * @return array
@@ -19,25 +38,26 @@ Class Module
     public function getServiceConfig()
     {
         return array(
+           'factories' => array(
             'comments_service_comment' => function($sm) {
                     $service = new Service\Comment();
                     $service->setServiceLocator($sm);
 
                     return $service;
-                },
-             'comments_entity_comment' => function ($sm) {
+            },
+            'comments_entity_comment' => function ($sm) {
                     $entity = new \Comments\Entity\Comment;
                     return $entity;
-                },
-             'comments_mapper_comment' => function ($sm) {
+            },
+            'comments_mapper_comment' => function ($sm) {
                     //todo - sort out some mod options
-                    $options = new \ZfModule\Options\ModuleOptions();
+                    $options = new \Comments\Options\CommentOptions();
                     $options->setCommentEntityClassName('Comments\Entity\Comment');
                     $options->setUserEntityClassName('User\Entity\User');
                     return new \Comments\Mapper\Comment(
                             $sm->get('doctrine.entitymanager.orm_default'), $options
                     );
-                },
+            },
                 // todo - complete refactor
                 'comments_service_comment' => function($sm) {
                     $service = new Service\Comment();
@@ -51,10 +71,15 @@ Class Module
 
                     return $form;
                 },
+                 'comments_form_comment_reply_form' => function($sm) {
+                    $form = new \Comments\Form\CommentReply();
+
+                    return $form;
+                },
                 // todo - complete refactor
                 'comments_view_model_reply' => function($sm) {
                     $viewModel = new \Comments\View\Model\Comment\Reply();
-                    $options = new \Comments\Options\ModuleOptions();
+                    $options = new \Comments\Options\CommentOptions();
                     // $template =  $options->getViewAddReplySuccessTemplateName();
                     $template = 'comments/comment/child-comment';
                     $viewModel->setTemplate($template);
@@ -64,7 +89,7 @@ Class Module
                     // todo - complete refactor
                 'comments_view_model_comment' => function($sm) {
                     $viewModel = new \Comments\View\Model\Comment\Comment();
-                    $options = new \Comments\Options\ModuleOptions();
+                    $options = new \Comments\Options\CommentOptions();
                     // $template =  $options->getViewAddSuccessTemplateName();
                     $template = 'comments/comment/comment';
                     $viewModel->setTemplate($template);
@@ -85,7 +110,7 @@ Class Module
                     return $viewModel;
                 },
                 // todo - complete refactor
-                'zfmodule_view_model_comment_reply_form' => function($sm) {
+                'comments_view_model_comment_reply_form' => function($sm) {
                     $viewModel = new \Zend\View\Model\ViewModel;
                     // $options = new \ZfModule\Options\ModuleOptions();
                     // $template =  $options->getViewAddSuccessTemplateName();
@@ -94,17 +119,30 @@ Class Module
                     $viewModel->setVariable('replyForm', $sm->get('comments_form_comment_reply_form'));
                     return $viewModel;
                 },
-        );
+        ),
+                        );
     }
     
      public function getViewHelperConfig() 
      {
         return array(
             'factories' => array(
-                'zfmoduleComments' => function ($sm) {
+                'Comments' => function ($sm) {
                     $helper = new \Comments\View\Helper\Comments;
-                    $service = $sm->getServiceLocator()->get('comment_service_comment');
+                    $service = $sm->getServiceLocator()->get('comments_service_comment');
                     $helper->setCommentService($service);
+                    return $helper;
+                },
+                'CommentEditForm' => function($sm){
+                    $helper = new \Comments\View\Helper\CommentEditForm;
+                    return $helper;
+                },
+                'CurrentUserIsCommentOwner' => function($sm){
+                    $helper = new \Comments\View\Helper\CurrentUserIsCommentOwner;
+                    return $helper;
+                },
+                'ReplyEditForm' => function($sm){
+                    $helper = new \Comments\View\Helper\ReplyEditForm;
                     return $helper;
                 },
              )

@@ -218,5 +218,3 @@ class Comment
         return $this;
     }    
 }
-
-?>

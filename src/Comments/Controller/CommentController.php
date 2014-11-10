@@ -15,11 +15,7 @@ use Zend\Mvc\Controller\AbstractActionController,
  */
 class CommentController extends AbstractActionController
 {
-   public function __construct()
-   {
-        $brk=1;
-   }
-
+   
     /**
      * add comment, user must be logged in
      * @return view model
@@ -83,7 +79,7 @@ class CommentController extends AbstractActionController
      * @param bool $terminal
      * @return Zend\View\Model\ViewModel
      */
-    public function renderAddReplyValidationFailed($form, $terminal=true)
+    protected function renderAddReplyValidationFailed($form, $terminal=true)
     {
         $viewParams = array('replacementForm' => $form);
         $view = $this->getServiceLocator()->get('comments_view_model_comment_reply_form');
@@ -98,7 +94,7 @@ class CommentController extends AbstractActionController
      * @param boll $terminal
      * @return Zend\View\Model\ViewModel
      */
-    public function renderAddValidationFailed($form, $terminal=true)
+    protected function renderAddValidationFailed($form, $terminal=true)
     {
         $viewParams = array('replacementForm' => $form);
         $view = $this->getServiceLocator()->get('comments_view_model_comment_form');
@@ -205,7 +201,7 @@ class CommentController extends AbstractActionController
             return $this->renderEditSuccess($success, true);
         }
         
-        throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been removed");       
+        throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been edited");       
     }
     /**
      * remove a comment
@@ -225,7 +221,7 @@ class CommentController extends AbstractActionController
         
         $service = $this->getServiceLocator()->get('comments_comment_service');
         
-        $success = $service->remove($userId, $commentId);
+        $success = $service->delete($userId, $commentId);
         if($success){
             
             return $this->renderRemoveSuccess();
@@ -263,7 +259,7 @@ class CommentController extends AbstractActionController
      * @param boolean $terminal
      * @return Zend\View\Model\ViewModel
      */
-    public function renderEditSuccess($result, $terminal=true)
+    protected function renderEditSuccess($result, $terminal=true)
     {
         $viewParams = array('comment' => $result);
         if($result->hasParent()){
@@ -279,7 +275,7 @@ class CommentController extends AbstractActionController
      * @return Zend\View\Model\ViewModel
      * @todo create view model for this
      */
-    public function renderRemoveSuccess()
+    protected function renderRemoveSuccess()
     {
         
     }
@@ -289,7 +285,7 @@ class CommentController extends AbstractActionController
      * @param boolean $terminal
      * @return Zend\View\Model\ViewModel
      */
-    public function renderComment($result, $terminal=true)
+    protected function renderComment($result, $terminal=true)
     {
         $viewParams = array('comment' => $result);
         $view = $this->getServiceLocator()->get('comments_view_model_comment');
@@ -304,7 +300,7 @@ class CommentController extends AbstractActionController
      * @param boolean $terminal
      * @return Zend\View\Model\ViewModel
      */
-    public function renderReply($result, $terminal=true)
+   protected function renderReply($result, $terminal=true)
     {        
         $viewParams = array('comment' => $result);
         $view = $this->getServiceLocator()->get('comments_view_model_reply');
