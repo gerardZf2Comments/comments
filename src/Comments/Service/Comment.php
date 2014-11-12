@@ -82,20 +82,22 @@ class Comment {
      * @return type
      * @throws Exc
      */
-    public function edit($userId, $moduleId, $commentId, $comment )
+    public function edit(  $commentId, $comment, $title, $user )
     {
-        $userId = (int) $userId;
+       
         $moduleId = (int) $moduleId;
         $commentId = (int) $commentId;
-        $comment = (int) $comment;
+        $comment = (string) $comment;
        
         /** @var \Comments\Entity\Comment */
-        $commentEntity = $this->getCommentMapper()->find($commentId);
-        if(!$commentEntity){
+        $commentEntity = $this->getCommentMapper()->findBy('id', $commentId);
+        if (!$commentEntity) {
             throw new Exception;
         }
-        $commentEntity->setUserId($userId);
-        $commentEntity->setModuleId($moduleId);
+        if(!is_object($user)|| !$this->hasPermission($commentEntity, $user)){
+            throwException('not the correct logged in user!!!!');
+        }
+        $commentEntity->setTitle($title);
         $commentEntity->setComment($comment);
         
         return $this->getCommentMapper()->update($commentEntity);
@@ -120,6 +122,18 @@ class Comment {
         }
        
         return $this->getCommentMapper()->delete($commentEntity);
+    }
+    public function close($commentId)
+    {
+        $commentId = (int) $commentId;
+        
+        $commentEntity = $this->getCommentMapper()->find($commentId);
+        if(!$commentEntity){ 
+            throw new Exception;
+        }
+       
+          $commentEntity->setIsClosed(1);
+          $this->getCommentMapper()->persist($commentEntity);
     }
    /**
     * 
@@ -179,7 +193,16 @@ class Comment {
         return $em->find( $commentMapper->getUserEntityClass(), 
                                   $id);
     }
-   
+
+    protected function hasPermission($commentEntity, $user)
+    {
+        $commentUser = $commentEntity->getUser();
+        $commentUserId = $commentUser->getId();
+        if($commentUserId === $user->getId()){
+            return true;
+        }
+        return false;
+    }
  }
 
-?>
+

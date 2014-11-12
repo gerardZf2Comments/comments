@@ -23,6 +23,11 @@ return array(
             
         )
     ),
+    'controller_plugins' => array(
+        'invokables' => array(
+            'validateParams' => 'Comments\Controller\Plugin\ValidateParams',
+        ),
+    ),
     'controllers' => array(
         'invokables' => array(
         

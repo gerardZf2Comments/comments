@@ -17,12 +17,22 @@ class Comments extends AbstractHelper implements ServiceLocatorAwareInterface
      /**
      * $var string template used for view
      */
-    protected $viewTemplate;
+    protected $viewTemplate = 'comments/comment/comments.phtml';
+    
+    protected $commentForm;
+    protected $replyForm;
 
     /**
      * @var ServiceLocator
      */
     protected $serviceLocator;
+
+    public function __construct($commentForm, $replyForm, $service) 
+    {
+        $this->commentForm = $commentForm;
+        $this->replyForm = $replyForm;
+        $this->setCommentService($service);
+    }
 
     /**
      * 
@@ -35,19 +45,28 @@ class Comments extends AbstractHelper implements ServiceLocatorAwareInterface
     {        
         $service = $this->getCommentService();
         $comments = $service->commentsByModuleId($moduleId, $limit, $sort, $order);
-         $vm = new ViewModel(array(
-            'comments' => $comments,
-             'moduleId' => $moduleId,
-        ));
-        $vm->setTemplate('zf-module/comment/comments.phtml');
-        
         $commentForm = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_form');
         $replyForm = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_reply_form');
+         $vm = new ViewModel(array(
+            'comments' => $comments,
+            'moduleId' => $moduleId,
+            'commentForm' => $this->commentForm,
+            'replyForm' => $replyForm,
+        ));
+        $vm->setTemplate($this->viewTemplate);
+        /////////////////////////////////
+         
         $commentForm->setVariable('moduleId', $moduleId);
-        $vm->addChild($commentForm, 'commentForm');
-        $vm->addChild($replyForm, 'replyForm');
-        return $this->getView()->render($vm);
         
+        return $this->getView()->render($vm);
+        //////////////////////////////////////
+       /*
+        $this->commentForm->setVariable('moduleId', $moduleId);
+        
+        $vm->addChild($this->commentForm, 'commentForm');
+        $vm->addChild($this->replyForm, 'replyForm');
+        return $this->getView()->render($vm);
+        */
     }
     public function setCommentService($cs){
         $this->commentService = $cs;

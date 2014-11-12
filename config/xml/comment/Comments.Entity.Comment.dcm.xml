@@ -18,6 +18,7 @@
         <field name="createdAt" column="created_at" type="datetime"   />
        
         <field name="hasParent" column="has_parent" type="integer"   />
+        <field name="isClosed" column="is_closed" type="integer"   />
        
       
         

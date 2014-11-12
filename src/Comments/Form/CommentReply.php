@@ -25,7 +25,13 @@ class CommentReply extends Form
         parent::__construct('comment-reply');
         
         $this->setInputFilter($this->getInputFilter()); 
-        
+        $this->add(array(
+           'name' => 'id',
+           'type' => 'Zend\Form\Element\Hidden',
+            'attributes' => array(
+                'class'=>'comment-reply-id',
+            ),
+        ));
         $this->add(array(
             'name' => 'parent-id',
             'type' => 'Zend\Form\Element\Hidden',

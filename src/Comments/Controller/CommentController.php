@@ -24,8 +24,8 @@ class CommentController extends AbstractActionController
      */
     public function addAction()
     {
-        if (!$this->zfcUserAuthentication()->hasIdentity()) {
-          //  return $this->redirect()->toRoute('zfcuser/login');
+            if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            return $this->redirect()->toRoute('zfcuser/login');
         }
         list($userId, $moduleId, $comment, $title) = $this->requestInfo();           
              
@@ -39,7 +39,6 @@ class CommentController extends AbstractActionController
            return $this->renderAddValidationFailed($form);
         } 
             
-        $userId= 1;
         $success = $service->add($userId, $moduleId, $comment, $title);         
        
         // it seems the add function either returns a collection or something else
@@ -173,7 +172,7 @@ class CommentController extends AbstractActionController
      */
     public function requestInfo()
     {
-        $userId = $this->zfcUserAuthentication()->getIdentity();
+        $userId = $this->zfcUserAuthentication()->getIdentity()->getId();
         $moduleId = $this->params()->fromPost('module-id','');
         $comment = $this->params()->fromPost('comment', '');
         $title = $this->params()->fromPost('title' ,'');
@@ -191,11 +190,14 @@ class CommentController extends AbstractActionController
             return $this->redirect()->toRoute('zfcuser/login');
         }
        
-        list($userId, $commentId, $comment) = $this->requestInfo();
-        
-        $service = $this->getServiceLocator()->get('comments_comment_service');
+        //list($userId, $commentId, $comment) = $this->requestInfo();
+        $user = $this->zfcUserAuthentication()->getIdentity();
+        $comment="hard coded string";
+        $moduleId = 1;
+        $commentId=1;
+        $service = $this->getServiceLocator()->get('comments_service_comment');
        
-        $success = $service->edit($userId, $commentId, $comment);
+        $success = $service->edit(  $commentId, $comment, $title, $user);
         if($success){
             
             return $this->renderEditSuccess($success, true);
@@ -217,9 +219,9 @@ class CommentController extends AbstractActionController
        
         list($userId, $commentId, $comment) = $this->requestInfo();
         
-        $this->validateRemoveParams($userId, $commentId);
+        $this->validateParams()->removeIsValid($userId, $commentId);
         
-        $service = $this->getServiceLocator()->get('comments_comment_service');
+        $service = $this->getServiceLocator()->get('comments_service_comment');
         
         $success = $service->delete($userId, $commentId);
         if($success){
@@ -229,13 +231,41 @@ class CommentController extends AbstractActionController
         
         throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been removed");  
     }
+    public function closeAction()
+    {
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            
+            return $this->redirect()->toRoute('zfcuser/login');
+        }
+       
+        list($userId, $commentId) = $this->requestInfo();
+        
+        $canClose = $this->validateParams()->closeIsValid($userId, $commentId);
+        if (!$canClose) {
+            //@todo-write this function
+            return $this->renderCloseErrorParams();
+        }
+        $service = $this->getServiceLocator()->get('comments_service_comment');
+        
+        $success = $service->close($commentId);
+        if($success){
+            
+            return $this->renderClosedSuccess();
+        }
+        
+        throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been closed");  
+    }
+        
+   
+
     /**
      * check we have ints for params
      * @param int $userId
      * @param int $commentId
      * @return boolean true
      * @throws \Comments\Controller\Exception\InvalidArgumentException
-     * @todo use a vailator chain
+     * @todo move to controller helper
+     * 
      */
     public function validateRemoveParams($userId, $commentId)
     {

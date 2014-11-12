@@ -1,11 +1,8 @@
-<?php 
-    //todo- move logic to helper???
-    // $allowEdit = $this->CurrentUserIsCommentOwner($comment);
-   
-?>
+<?php $allowEdit = $this->CurrentUserIsCommentOwner($comment); ?>
+
 <div class="comment-wrapper">
     <?php //hide edit form in comment wrapper, show it on click ?>
-    <?php if($allowEdit):?>
+    <?php if(!$allowEdit):?>
         
             <?= $this->CommentEditForm($comment); ?>
   
@@ -17,13 +14,21 @@
     <div> 
         <span class="comment-discriptor-label"><?= $this->translate('Username') ?> : </span>
         <span class="module-comments-username"><strong><?= $this->EscapeHtml($comment->getUser()->getUserName()) ?></strong> </span>
+        </div>
+        <div>
         <?php
             //todo- write js to display, ajax, success, errors etc
             if($allowEdit):
         ?>
-        <span class="comment-edit-button span-float-right">edit</span>
-    <?php endif; ?>
-    </div>
+       
+            <span class="comment-edit-button comment-button">edit</span>
+            <?php endif; ?>
+                <?php if($allowEdit || $this->CurrentUserIsModuleOwner($comment)) : ?>
+            <span class="comment-close-button comment-button">close</span>
+            <?php endif; ?>
+        </div>
+    
+ 
     <div>
         <span class="module-comments-comment"><?= $this->EscapeHtml($comment->getComment()) ?> </span>
     </div> 
@@ -40,18 +45,17 @@
 
     <span class="show-hide-child-comments-button comment-button"><?= $this->translate('Show Replies') ?></span>
     <span> || </span>
+   
+    <?php if ($this->zfcUserIdentity()) { ?>
     <span class="reply-to-comment-button comment-button"><?= $this->translate('Reply') ?></span>
-    <?php // todo- remove || ?>
-    <?php if ($this->zfcUserIdentity() || 1) { ?>
-    <?=  $this->renderChildModel('replyForm') ?>
+    
+    <?=  $this->render($replyForm) ?>
        
-    <?php } else { ?>
-    //todo- think about how generic templ would login (widget???)
-    <a href="<?php
-                echo $this->url('scn-social-auth-user/login/provider', array('provider' => 'github'));
-            ?>"><?= $this->translate('Login to reply') ?></a>
+    <?php } else { 
+    
+    echo $this->loginLink($this);
         
-<?php } // end else  ?>
+    } // end else  ?>
     <hr>
     </div><!-- end - class="child-comments-wrapper" -->
 </div><!-- end - class="comment-wrapper" -->

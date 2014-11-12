@@ -1,6 +1,6 @@
 <?php
 
-namespace Comments\View\Helper;
+namespace Comments\View\Helper\Form;
 
 
 use Zend\View\Helper\AbstractHelper;
@@ -13,17 +13,24 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  *@todo refactor methods
  * @author gerard
  */
-class ReplyEditForm extends AbstractHelper implements ServiceLocatorAwareInterface
+class ReplyEdit extends AbstractHelper implements ServiceLocatorAwareInterface
 {
      /**
      * $var string template used for view
      */
-    protected $viewTemplate;
+    protected $viewTemplate = 'comments/comment/form/edit/reply.phtml';
 
     /**
      * @var ServiceLocator
      */
     protected $serviceLocator;
+
+    public function __construct($viewTemplate = null)
+    {
+        if (is_string($viewTemplate)){
+            $this->setViewTemplate($viewTemplate);
+        }
+    }
 
     /**
      * 
@@ -34,20 +41,35 @@ class ReplyEditForm extends AbstractHelper implements ServiceLocatorAwareInterfa
      */
     public function __invoke($reply)
     { 
-        //
-        $data=array(
-            'parent-id' => $reply->getParent()->getId(),
-            'comment' => $reply->getComment(),
-        );
-        $form = new Form();
-        $form->setData($data);
-        $vMData = array('replyForm' => $form );
-        $vM = new ViewModel();
-        $template = 'comments/comment/reply-form-edit.phtml';
-        $vM->setTemplate($template);
+        $vMData = array('replyForm' => $this->prepareForm($reply));
+        $vM = new ViewModel($vMData);
+        
+        $vM->setTemplate($this->viewTemplate);
         return $this->getView()->render($vM);
     }
-    
+
+    protected function prepareForm($reply)
+    {
+        $formData=array(
+            'parent-id' => $reply->getParent()->getId(),
+            'comment' => $reply->getComment(),
+            'id'=> $reply->getId(),
+        );
+        $form = new Form();
+        $form->setData($formData);
+        
+        return $form;
+    }
+    public function setViewTemplate($vt)
+    {
+        $this->viewTemplate = $vt;
+        return $this;
+    }
+    public function getViewTemplate()
+    {
+        return $this->viewTemplate;
+    }
+
     /**
      * {@inheritdoc}
      */

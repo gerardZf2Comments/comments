@@ -1,8 +1,8 @@
 <?php
 
-namespace Comments\View\Helper;
+namespace Comments\View\Helper\Form;
 
-
+use Comments\Form\Comment as Form;
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Model\ViewModel;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -12,7 +12,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  *@todo refactor methods
  * @author gerard
  */
-class CommentEditForm extends AbstractHelper implements ServiceLocatorAwareInterface
+class CommentEdit extends AbstractHelper implements ServiceLocatorAwareInterface
 {
      /**
      * $var string template used for view
@@ -24,6 +24,7 @@ class CommentEditForm extends AbstractHelper implements ServiceLocatorAwareInter
      */
     protected $serviceLocator;
 
+    protected $template = 'comments/comment/form/edit/comment.phtml';
     /**
      * 
      * @param int $moduleId
@@ -35,16 +36,16 @@ class CommentEditForm extends AbstractHelper implements ServiceLocatorAwareInter
     { 
         //
         $data=array(
+            'id'=>$comment->getId(),
             'module-id' => $comment->getModuleId(),
             'comment' => $comment->getComment(),
-            'title' => $comment->title(),
+            'title' => $comment->getTitle(),
         );
         $form = new Form();
         $form->setData($data);
         $vMData = array('commentForm' => $form );
-        $vM = new ViewModel();
-        $template = 'comments/comment/comment-form-edit.phtml';
-        $vM->setTemplate($template);
+        $vM = new ViewModel($vMData);
+        $vM->setTemplate($this->template);
         return $this->getView()->render($vM);
     }
     

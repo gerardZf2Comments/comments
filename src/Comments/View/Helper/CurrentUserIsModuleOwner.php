@@ -12,7 +12,7 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  *@todo refactor methods
  * @author gerard
  */
-class CurrentUserIsCommentOwner extends AbstractHelper implements ServiceLocatorAwareInterface
+class CurrentUserIsModuleOwner extends AbstractHelper implements ServiceLocatorAwareInterface
 {
 
     /**
@@ -30,13 +30,15 @@ class CurrentUserIsCommentOwner extends AbstractHelper implements ServiceLocator
     public function __invoke($comment)
     {   
         $user = $this->getView()->zfcUserIdentity();
-        if (!$user){
+        if (!$user) {
             return false;
         }
-        $userId = $user->getId();
-        $commentUserId = $comment->getUser()->getId();
-        if( $userId === $commentUserId)
-        {
+        $username = $user->getUsername();
+        
+        $moduleId = $comment->getModuleId();
+        $mM = $this->getServiceLocator()->getServiceLocator()->get('zfmodule_mapper_module');
+        if( $mM->moduleIsOwnedBy($moduleId, $username)) {
+        
             return true;        
         }
         return false;

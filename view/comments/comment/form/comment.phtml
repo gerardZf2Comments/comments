@@ -1,7 +1,7 @@
  <?php
- if($this->replacementForm){
-    $commentForm = $this->replacementForm;
- }
+
+$commentForm = $this->commentForm;
+ 
 $commentForm->setAttribute('action', $this->url("comment/add"));
 $commentForm->setAttribute('method', 'post');
 // $commentForm->setData(array('module-id' =>$moduleId));
@@ -11,6 +11,9 @@ $commentForm->prepare();
 
     <div class="input-wrapper">
         <?= $this->formRow($commentForm->get('module-id')); ?>
+    </div><!-- end - class="input-wrapper"-->
+    <div class="input-wrapper">
+        <?= $this->formRow($commentForm->get('id')); ?>
     </div><!-- end - class="input-wrapper"-->
    
      <div class="element-wrapper">

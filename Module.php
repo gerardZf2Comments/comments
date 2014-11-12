@@ -103,7 +103,7 @@ Class Module
                     $viewModel = new \Zend\View\Model\ViewModel;
                     // $options = new \ZfModule\Options\ModuleOptions();
                     // $template =  $options->getViewAddSuccessTemplateName();
-                    $template = 'comments/comment/comment-form';
+                    $template = 'comments/comment/form/comment';
                     $viewModel->setTemplate($template);
                     $viewModel->setVariable('commentForm', $sm->get('comments_form_comment_form'));
                     
@@ -114,7 +114,7 @@ Class Module
                     $viewModel = new \Zend\View\Model\ViewModel;
                     // $options = new \ZfModule\Options\ModuleOptions();
                     // $template =  $options->getViewAddSuccessTemplateName();
-                    $template = 'comments/comment/reply-form';
+                    $template = 'comments/comment/form/reply';
                     $viewModel->setTemplate($template);
                     $viewModel->setVariable('replyForm', $sm->get('comments_form_comment_reply_form'));
                     return $viewModel;
@@ -128,13 +128,16 @@ Class Module
         return array(
             'factories' => array(
                 'Comments' => function ($sm) {
-                    $helper = new \Comments\View\Helper\Comments;
+                    $commentForm = $sm->getServiceLocator()->get('comments_view_model_comment_form');
+                    $replyForm = $sm->getServiceLocator()->get('comments_view_model_comment_reply_form');
+                    
                     $service = $sm->getServiceLocator()->get('comments_service_comment');
-                    $helper->setCommentService($service);
+                    $helper = new \Comments\View\Helper\Comments($commentForm, $replyForm, $service);
+                    
                     return $helper;
                 },
                 'CommentEditForm' => function($sm){
-                    $helper = new \Comments\View\Helper\CommentEditForm;
+                    $helper = new \Comments\View\Helper\Form\CommentEdit;
                     return $helper;
                 },
                 'CurrentUserIsCommentOwner' => function($sm){
@@ -142,9 +145,17 @@ Class Module
                     return $helper;
                 },
                 'ReplyEditForm' => function($sm){
-                    $helper = new \Comments\View\Helper\ReplyEditForm;
+                    $helper = new \Comments\View\Helper\Form\ReplyEdit;
                     return $helper;
                 },
+                'LoginLink' => function($sm){
+                    $helper = new \Comments\View\Helper\LoginLink;
+                    return $helper;
+                },
+                 'CurrentUserIsModuleOwner' => function($sm){
+                    $helper = new \Comments\View\Helper\CurrentUserIsModuleOwner;
+                    return $helper;
+                 }
              )
          );
      }

@@ -49,6 +49,10 @@ class Comment
      * @var string
      */
     protected $comment;
+    /*
+     * @var int
+     */
+    protected $isClosed;
     /**
      *using doctrine datatimes are persisted and retrieved as objects
      * @var \Datetime
@@ -150,6 +154,16 @@ class Comment
         $this->user = $user;
         return $this;
     }
+    public function getIsClosed()
+    {
+       return $this->isClosed;       
+    }
+    public function setIsClosed($isClosed)
+    {
+        $this->isClosed = (int)$isClosed;       
+        return $this;
+    }
+
     /**
      * get a set comment
      * @return string

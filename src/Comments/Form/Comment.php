@@ -26,7 +26,13 @@ class Comment extends Form {
         
         parent::__construct('comment');
         $this->setInputFilter($this->getInputFilter()); 
-        
+        $this->add(array(
+           'name' => 'id',
+           'type' => 'Zend\Form\Element\Hidden',
+            'attributes' => array(
+                'class'=>'comment-id',
+            ),
+        ));
         $this->add(array(
             'name' => 'module-id',
             'type' => 'Zend\Form\Element\Hidden',
