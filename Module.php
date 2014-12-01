@@ -88,13 +88,16 @@ Class Module
                 },
                     // todo - complete refactor
                 'comments_view_model_comment' => function($sm) {
-                    $viewModel = new \Comments\View\Model\Comment\Comment();
-                    $options = new \Comments\Options\CommentOptions();
+                    $replyFormView = $sm->get('comments_view_model_comment_reply_form');
+                    $vars = array('replyForm' => $replyFormView);
+                    $viewModel = new \Comments\View\Model\Comment\Comment($vars);
+                    
+                    //$options = new \Comments\Options\CommentOptions();
                     // $template =  $options->getViewAddSuccessTemplateName();
                     $template = 'comments/comment/comment';
                     $viewModel->setTemplate($template);
-                    $replyFormView = $sm->get('comments_view_model_comment_reply_form');
-                    $viewModel->addChild($replyFormView, 'replyForm');
+                    
+                 //   $viewModel->addChild($replyFormView, 'replyForm');
 
                     return $viewModel;
                 },

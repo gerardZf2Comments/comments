@@ -1,7 +1,7 @@
 <?php /** @todo-conditional logic to print edit form hidden with some css descriptors for the js */ ?>
 <?php $allowEdit = $this->CurrentUserIsCommentOwner($comment); ?>
 <div class="module-child-comment-wrapper">
-     <?php //hide edit form in comment wrapper, show it on click ?>
+     <?php //@todo change this ?>
     <?php if(!$allowEdit):?>
         
             <?= $this->ReplyEditForm($comment); ?>
@@ -13,10 +13,10 @@
             <strong><?= $this->EscapeHtml($comment->getUser()->getUserName()) ?> </strong>
         </span>
          <?php
-            //todo- write js to display, ajax, success, errors etc
-            if($allowEdit):
+            //@todo change this
+            if(!$allowEdit):
         ?>
-        <span class="comment-edit-button span-float-right">edit</span>
+        <span class="reply-edit-button span-float-right">edit</span>
     <?php endif; ?>
     </div>
     <div>

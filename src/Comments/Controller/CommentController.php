@@ -11,11 +11,13 @@ use Zend\Mvc\Controller\AbstractActionController,
  * @todo make this clearly fully ajax
  * @todo fix all exceptions 
  * @todo remove hard coded user id
+ * @todo create render helper
  * @author gerard
  */
 class CommentController extends AbstractActionController
 {
    
+    
     /**
      * add comment, user must be logged in
      * @return view model
@@ -24,28 +26,28 @@ class CommentController extends AbstractActionController
      */
     public function addAction()
     {
-            if (!$this->zfcUserAuthentication()->hasIdentity()) {
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
             return $this->redirect()->toRoute('zfcuser/login');
         }
-        list($userId, $moduleId, $comment, $title) = $this->requestInfo();           
+        list($user, $moduleId, $id, $comment, $title) = $this->commentParams();           
              
         $service = $this->getServiceLocator()->get('comments_service_comment');
-     
+        //@todo instanciate this in helper and return it
         $form = new \Comments\Form\Comment();
-        $formIsValid = $this->validateCommentForm($form, $moduleId, $comment, $title);
+        $formIsValid = $this->commentsValidate()->validateCommentForm($form, $moduleId, $comment, $title);
           
-        if (!$form->isValid()) {
+        if (!$formIsValid) {
               
-           return $this->renderAddValidationFailed($form);
+           return $this->commentsRender()->addValidationFailed($form);
         } 
             
-        $success = $service->add($userId, $moduleId, $comment, $title);         
+        $success = $service->add($user, $moduleId, $comment, $title);         
        
         // it seems the add function either returns a collection or something else
         if ($success) {
             $success = $success;
             
-            return $this->renderComment($success, true); 
+            return $this->commentsRender()->comment($success, true); 
         }
         
         $message = 'Comment not added';
@@ -53,25 +55,18 @@ class CommentController extends AbstractActionController
         throw new Exception\DomainException($message);
         
     }
-    /**
-     * set data & valiadte comment form
-     * @param Zend\Form\Form $form
-     * @param int $moduleId
-     * @param string $comment
-     * @param string $title
-     * @return bool
-     */
-    public function validateCommentForm($form, $moduleId, $comment, $title)
+   
+    protected function getEditForm($data) 
     {
-        $form->setData(array(
-            'module-id' => $moduleId,
-            'comment'=> $comment,
-            'title' => $title,               
-        ));
-        
-        return $form->isValid();
+        $ass = array();
+        $ass['id'] = $data[1];
+        $ass['module-id'] = $data[2];
+        $ass['comment'] = $data[3];
+        $ass['title'] = $data[4];
+        $form = new \Comments\Form\Comment;
+        $form->setData($ass);
+        return $form;
     }
-
     /**
      * render view model with form printing messages
      * @param Zend\Form\Form $form
@@ -115,70 +110,56 @@ class CommentController extends AbstractActionController
         if (!$this->zfcUserAuthentication()->hasIdentity()) {
             //return $this->redirect()->toRoute('zfcuser/login');
         }
-        list($userId, $parentCommentId, $comment) = $this->getReplyFormParams();
-        
+        list($user, $parentCommentId, $comment) = $this->replyParams();
+        //@todo form move to helper 
         $form = new \Comments\Form\CommentReply();
-        $formIsValid = $this->validateReplyForm($form, $parentCommentId, $comment);
+        $formIsValid = $this->commentsValidate()->validateReplyForm($form, $parentCommentId, $comment);
        
         if (!$formIsValid) {
             
-           return $this->renderAddReplyValidationFailed($form);
+           return $this->commentsRender()->replyValidationFailed($form);
         } 
-        $userId =1;           
+                   
         $service = $this->getServiceLocator()->get('comments_service_comment');
-        $success = $service->addReply($userId, $comment, $parentCommentId);
-        if($success){
+        $success = $service->addReply($user, $comment, $parentCommentId);
+        if ($success) {
                
-            return $this->renderReply($success, true);       
+            return $this->commentsRender()->reply($success, true);       
         } 
        
         $message = 'Reply not added';
            
         throw new Exception\DomainException($message);      
     }
+    
     /**
      * array($userId, $parentCommentId, $comment);
      * @return array
      */
-    public function getReplyFormParams()
+    protected function replyParams()
     {
-        $userId = $this->zfcUserAuthentication()->getIdentity();
+        $user = $this->zfcUserAuthentication()->getIdentity();
         $parentCommentId = $this->params()->fromPost('parent-id');
         $comment = $this->params()->fromPost('comment');  
       
-        return array($userId, $parentCommentId, $comment);
-    }
-
-    /**
-     * set data and call is valid
-     * @param Zend\Form\Form $form
-     * @param int $parentCommentId
-     * @param string $comment
-     * @return bool
-     */
-    public function validateReplyForm($form,  $parentCommentId, $comment) 
-    {
-        $form->setData(array(
-            'module-id' => $parentCommentId,
-            'comment'=> $comment,               
-        ));
-        
-        return $form->isValid();
+        return array($user, $parentCommentId, $comment);
     }
 
     /**
      * return array($userId, $moduleId, $comment, $title);
      * @return array
      */
-    public function requestInfo()
+    protected function commentParams()
     {
-        $userId = $this->zfcUserAuthentication()->getIdentity()->getId();
-        $moduleId = $this->params()->fromPost('module-id','');
+        $user = $this->zfcUserAuthentication()->getIdentity();
+        $id = $this->params()->fromPost('id', '');
+        $moduleId = $this->params()->fromPost('module-id', '');
         $comment = $this->params()->fromPost('comment', '');
-        $title = $this->params()->fromPost('title' ,'');
+        $title = $this->params()->fromPost('title', '');
         
-        return array($userId, $moduleId, $comment, $title);
+        return array($user, $id, $moduleId, $comment, $title);
     }
+    
     /**
      * edit comment, user must be logged in
      * @return Zend\View\Model\ViewModel
@@ -186,25 +167,33 @@ class CommentController extends AbstractActionController
      */
     public function editAction()
     {
+        //create a login function to save from this bs
         if (!$this->zfcUserAuthentication()->hasIdentity()) {
-            return $this->redirect()->toRoute('zfcuser/login');
+            //return $this->redirect()->toRoute('zfcuser/login');
         }
-       
-        //list($userId, $commentId, $comment) = $this->requestInfo();
-        $user = $this->zfcUserAuthentication()->getIdentity();
-        $comment="hard coded string";
-        $moduleId = 1;
-        $commentId=1;
-        $service = $this->getServiceLocator()->get('comments_service_comment');
-       
-        $success = $service->edit(  $commentId, $comment, $title, $user);
-        if($success){
-            
-            return $this->renderEditSuccess($success, true);
-        }
+      
+        list($user, $commentId, $moduleId, $comment, $title) = $this->commentParams();
         
-        throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been edited");       
+        $canEdit = $this->commentsValidate()->editIsValid($commentId);
+        //@todo validate form data.
+        if (!$canEdit) {
+            //@todo write getEditForm
+            $form = $this->getEditForm($this->commentParams());
+            if ( !$form->isValid()) {
+                return $this->commentsRender()->editFormError($form);
+            }
+            $service = $this->getServiceLocator()->get('comments_service_comment');
+        
+            $success = $service->edit($commentId, $comment, $title);
+            if ($success) {
+            
+                return $this->commentsRender()->editSuccess($success, true);
+            }
+            throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been edited");
+        }
+        return $this->commentsRender()->editFailure();       
     }
+    
     /**
      * remove a comment
      * @return mixed either redirect or view
@@ -217,20 +206,24 @@ class CommentController extends AbstractActionController
             return $this->redirect()->toRoute('zfcuser/login');
         }
        
-        list($userId, $commentId, $comment) = $this->requestInfo();
-        
-        $this->validateParams()->removeIsValid($userId, $commentId);
-        
-        $service = $this->getServiceLocator()->get('comments_service_comment');
-        
-        $success = $service->delete($userId, $commentId);
-        if($success){
+        list($user, $commentId) = $this->commentParams();
+       
+        $canRemove = $this->commentsValidate()->removeIsValid($commentId);
+        if ($canRemove) {
+            $service = $this->getServiceLocator()->get('comments_service_comment');
+            try {
+                $service->delete($commentId);          
             
-            return $this->renderRemoveSuccess();
+                return $this->commentsRender()->removeSuccess();
+            } catch ( \Doctrine\ORM\ORMInvalidArgumentException $ex) {
+                
+                return $this->renderRemoveFailure();
+            }
         }
-        
-        throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been removed");  
+        return $this->commentsRender()->removeFailure();
+         
     }
+    
     public function closeAction()
     {
         if (!$this->zfcUserAuthentication()->hasIdentity()) {
@@ -238,51 +231,54 @@ class CommentController extends AbstractActionController
             return $this->redirect()->toRoute('zfcuser/login');
         }
        
-        list($userId, $commentId) = $this->requestInfo();
-        
-        $canClose = $this->validateParams()->closeIsValid($userId, $commentId);
+        list($user, $commentId) = $this->commentParams();
+        $commentId = 1;
+        $canClose = $this->commentsValidate()->closeIsValid($commentId);
         if (!$canClose) {
             //@todo-write this function
-            return $this->renderCloseErrorParams();
+            return $this->commentsRender()->closeFailure();
         }
         $service = $this->getServiceLocator()->get('comments_service_comment');
         
         $success = $service->close($commentId);
-        if($success){
+        if ($success) {
             
-            return $this->renderClosedSuccess();
+            return $this->commentsRender()->closeSuccess();
         }
         
         throw new \Comments\Controller\Exception\DomainException("Comment doesn't seem to have been closed");  
     }
-        
-   
-
-    /**
-     * check we have ints for params
-     * @param int $userId
-     * @param int $commentId
-     * @return boolean true
-     * @throws \Comments\Controller\Exception\InvalidArgumentException
-     * @todo move to controller helper
-     * 
-     */
-    public function validateRemoveParams($userId, $commentId)
+    
+    protected function renderCloseSuccess()
     {
-        $message = array();
-        if(!is_int($userId)){
-            $message[] = "User not found.";
-        }
-        if(!is_int($commentId)){
-            $message[] = "Comment not found in request.";
-        }
-        if($message){
-            $message = implode(' ', $message);
-            
-            throw new \Comments\Controller\Exception\InvalidArgumentException($message);
-        }
-        return true;
+        $vM = new ViewModel;
+        $vM->setTemplate('comments/comment/close-success.phtml');
+        $vM->setTerminal(true);
+        return $vM;
     }
+    protected function renderCloseFailure()
+    {
+        $vM = new ViewModel;
+        $vM->setTemplate('comments/comment/close-failure.phtml');
+        $vM->setTerminal(true);
+        return $vm;
+    }
+
+    protected function renderRemoveSuccess()
+    {
+        $vM = new ViewModel;
+        $vM->setTemplate('comments/comment/remove-success.phtml');
+        $vM->setTerminal(true);
+        return $vM;
+    }
+    protected function renderRemoveFailure()
+    {
+        $vM = new ViewModel;
+        $vM->setTemplate('comments/comment/remove-failure.phtml');
+        $vM->setTerminal(true);
+        return $vM;
+    }
+
     /**
      * render either comment or reply sucedss view
      * @param entity $result
@@ -291,23 +287,19 @@ class CommentController extends AbstractActionController
      */
     protected function renderEditSuccess($result, $terminal=true)
     {
-        $viewParams = array('comment' => $result);
-        if($result->hasParent()){
-            
-            return $this->renderComment($result);
+        if ($result->getHasParent()) {
+            return $this->renderReply($result, $terminal);            
         } else {
+            return $this->renderComment($result, $terminal);
             
-            return $this->renderReply($result);
         }
     }
-    /**
-     * render a generic this thing hs been removed message
-     * @return Zend\View\Model\ViewModel
-     * @todo create view model for this
-     */
-    protected function renderRemoveSuccess()
+    protected function renderEditFailure()
     {
-        
+        $vM = new ViewModel;
+        $vM->setTemplate('comments/comment/edit-failure.phtml');
+        $vM->setTerminal(true);
+        return $vM;
     }
     /**
      * get('comments_view_model_comment')
@@ -330,7 +322,7 @@ class CommentController extends AbstractActionController
      * @param boolean $terminal
      * @return Zend\View\Model\ViewModel
      */
-   protected function renderReply($result, $terminal=true)
+    protected function renderReply($result, $terminal=true)
     {        
         $viewParams = array('comment' => $result);
         $view = $this->getServiceLocator()->get('comments_view_model_reply');
@@ -338,7 +330,5 @@ class CommentController extends AbstractActionController
         $view->setTerminal($terminal);
         
         return $view;
-    }    
+    }
 }
-
-?>

@@ -1,12 +1,8 @@
 <?php $allowEdit = $this->CurrentUserIsCommentOwner($comment); ?>
 
 <div class="comment-wrapper">
-    <?php //hide edit form in comment wrapper, show it on click ?>
-    <?php if(!$allowEdit):?>
-        
-            <?= $this->CommentEditForm($comment); ?>
-  
-    <?php endif; ?>
+    
+    <div class="comment-labels">
     <div>
         <span class="comment-discriptor-label"><?= $this->translate('Title') ?> : </span>
         <span class="module-comments-title"><strong><?= $this->EscapeHtml($comment->getTitle()) ?></strong> </span>
@@ -15,24 +11,31 @@
         <span class="comment-discriptor-label"><?= $this->translate('Username') ?> : </span>
         <span class="module-comments-username"><strong><?= $this->EscapeHtml($comment->getUser()->getUserName()) ?></strong> </span>
         </div>
+        
+        </div><!-- comment-labels -->
         <div>
         <?php
-            //todo- write js to display, ajax, success, errors etc
-            if($allowEdit):
+            //todo- change this
+            if(!$allowEdit):
         ?>
-       
+        
             <span class="comment-edit-button comment-button">edit</span>
             <?php endif; ?>
-                <?php if($allowEdit || $this->CurrentUserIsModuleOwner($comment)) : ?>
+                    <?php if(!$allowEdit || $this->CurrentUserIsModuleOwner($comment)) : ?>
             <span class="comment-close-button comment-button">close</span>
             <?php endif; ?>
         </div>
     
  
-    <div>
+    <div class="comment-content">
         <span class="module-comments-comment"><?= $this->EscapeHtml($comment->getComment()) ?> </span>
     </div> 
-
+    <?php //change this ?>
+    <?php if(!$allowEdit):?>
+        <div>
+            <?= $this->CommentEditForm($comment); ?>
+        </div>
+    <?php endif; ?>
     <div class="child-comments-wrapper" parent-id="<?= $comment->getId() ?>">
     <div class="child-comments" >
         <?php 
@@ -46,7 +49,7 @@
     <span class="show-hide-child-comments-button comment-button"><?= $this->translate('Show Replies') ?></span>
     <span> || </span>
    
-    <?php if ($this->zfcUserIdentity()) { ?>
+    <?php if (!$this->zfcUserIdentity()) { ?>
     <span class="reply-to-comment-button comment-button"><?= $this->translate('Reply') ?></span>
     
     <?=  $this->render($replyForm) ?>

@@ -101,7 +101,7 @@ class Comment extends Form {
             ));
             $inputFilter->add(array(
                 'name' => 'title',
-                'required' => false,
+                'required' => true,
                 ' filters' => array(
                     array('name' => 'StripTags'),
                     array('name’ => ’StringTrim'),

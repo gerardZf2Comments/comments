@@ -25,7 +25,8 @@ return array(
     ),
     'controller_plugins' => array(
         'invokables' => array(
-            'validateParams' => 'Comments\Controller\Plugin\ValidateParams',
+            'commentsValidate' => 'Comments\Controller\Plugin\Validate',
+            'commentsRender' => 'Comments\Controller\Plugin\Render',
         ),
     ),
     'controllers' => array(
@@ -96,16 +97,30 @@ return array(
                             ),
                         ),
                     ),
+                    /*
                     'add-reply' => array(
                         'type' => 'Literal',
                         'options' => array(
                             'route' => '/add-reply',
                             
                             'defaults' => array(
-                                'action' => 'addReply',
+                                'controller' => 'Comments\Controller\Reply',
+                                'action' => 'add',
                             ),
                         ),
                     ),
+                    'edit-reply' => array(
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/edit-reply',
+                            
+                            'defaults' => array(
+                                'controller' => 'Comments\Controller\Reply',
+                                'action' => 'edit',
+                            ),
+                        ),
+                    ),
+                    */
                     'remove' => array(
                         'type' => 'Literal',
                         'options' => array(
@@ -123,6 +138,16 @@ return array(
                             
                             'defaults' => array(
                                 'action' => 'edit',
+                            ),
+                        ),
+                    ),
+                    'close' => array(
+                        'type' => 'Literal',
+                        'options' => array(
+                            'route' => '/close',
+                            
+                            'defaults' => array(
+                                'action' => 'close',
                             ),
                         ),
                     ),

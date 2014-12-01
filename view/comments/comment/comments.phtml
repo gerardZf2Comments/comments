@@ -17,11 +17,13 @@
     if (count($comments)) {
         //loop to display comments
         foreach ($comments as $key => $comment) {
-            echo $this->partial('comments/comment/comment.phtml',
+            if (!$comment->getIsClosed()){
+                echo $this->partial('comments/comment/comment.phtml',
                                 array('comment' => $comment ,
                                       'moduleId' => $moduleId,
                                       'replyForm'=>  $replyForm,
                                     ));
+            }
             ?>
 
            
@@ -36,9 +38,10 @@
         <div class="add-new-comment-wrapper">
     <?php if ($this->zfcUserIdentity()) {  ?>
         <div class="add-new-comment-wrapper">
-        <span class="new-comment-button comment-button"><strong><?= $this->translate('Add New Comment') ?></strong></span>
-      <?=  $this->render($commentForm) ?>
-       
+            <span class="new-comment-button comment-button"><strong><?= $this->translate('Add New Comment') ?></strong></span>
+            <div class="new-comment-form-wrapper">
+                <?=  $this->render($commentForm) ?>
+            </div>
         
     <?php } else { ?>
         <?= $this->LoginLink($this,$this->translate('Login to add new comment')); ?>

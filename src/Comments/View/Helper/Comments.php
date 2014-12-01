@@ -53,6 +53,7 @@ class Comments extends AbstractHelper implements ServiceLocatorAwareInterface
             'commentForm' => $this->commentForm,
             'replyForm' => $replyForm,
         ));
+         $vm->addChild($replyForm, 'replyForm');
         $vm->setTemplate($this->viewTemplate);
         /////////////////////////////////
          

@@ -7,7 +7,7 @@ $commentForm->setAttribute('method', 'post');
 // $commentForm->setData(array('module-id' =>$moduleId));
 $commentForm->prepare();
 ?>
-<form action="/comment/add" method="post" class="add-new-comment-form">
+<form action="/comment/add" method="post"  class="comment add-new-comment-form">
 
     <div class="input-wrapper">
         <?= $this->formRow($commentForm->get('module-id')); ?>

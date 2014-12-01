@@ -21,128 +21,159 @@ class Comment {
      * @return type
      * @throws Exc
      */
-    public function add($userId, $moduleId, $comment, $title){
-        $userId = (int) $userId;
+    public function add($user, $moduleId, $comment, $title)
+    {
+        
         $moduleId = (int) $moduleId;
         $comment = (string) $comment;
         $title = (string)$title;
-        // WTF
-        $user = $this->getUserById($userId);
-         /** @var \Comments\Entity\Comment */
-        $commentEntity = $this->getCommentEntity();
-       // $parent = $this->getCommentEntity();
-        $userId = $user->getId();
-     
-        $userComments =$user->getUserComments();
         
-        foreach ($userComments as $userComment) {
-           
-        }
+        
+         /** @var \Comments\Entity\Comment */
+        $commentEntity = $this->getCommentEntity();        
         $commentEntity->setUser($user);
-        // END WTF
+        //@todo - is this needed for doctrine?
         $user->getUserComments()->add($commentEntity);
         $commentEntity->setModuleId($moduleId);
         $commentEntity->setComment($comment);
         $commentEntity->setTitle($title);
-    //    $commentEntity->setParent($parent);
+    
         $commentEntity->setHasParent(0);
-        return $this->getCommentMapper()->insert($commentEntity);
-    }
-    public function addReply($userId, $comment, $parentCommentId)
+        try{
+            return $this->getCommentMapper()->insert($commentEntity);
+        } catch (\Exception $ex) {
+            return false; 
+        }
+             
+   }
+    public function addReply($user, $comment, $parentCommentId)
     {
-        $userId = (int) $userId;
+       
         $parentCommentId = (int) $parentCommentId;
-        $comment = (string) $comment;
-        
+        $comment = (string) $comment;      
         
         $commentMapper = $this->getCommentMapper();
         $em = $commentMapper->getEntityManager();
+        
         $parentComment = $em->find( $commentMapper->getCommentEntityClass(), 
-                                  $parentCommentId);
+            $parentCommentId
+        );
+        
         $moduleId = $parentComment->getModuleId();
-        $user = $em->find('User\Entity\User', $userId);
+        
         /** @var \Comments\Entity\Comment */
         $commentEntity = $this->getCommentEntity();
-        $userId = $user->getId();
+        
         $commentEntity->setUser($user);
         $commentEntity->setModuleId($moduleId);
         $commentEntity->setParent($parentComment);
         $commentEntity->setComment($comment);
         $commentEntity->setHasParent(1);
         
-        return $this->getCommentMapper()->insert($commentEntity);
+        try {
+            return $this->getCommentMapper()->insert($commentEntity);
+        } catch (\Exception $exc) {
+            return false;
+        }        
     }
 
     /**
      * 
-     * @param int $userId
-     * @param int $moduleId
      * @param int $commentId
      * @param string $comment
-     * @return type
-     * @throws Exc
+     * @param string $title Description
+     * @return mixed
      */
-    public function edit(  $commentId, $comment, $title, $user )
+    public function edit(  $commentId, $comment, $title = "")
     {
-       
-        $moduleId = (int) $moduleId;
         $commentId = (int) $commentId;
         $comment = (string) $comment;
+        $title = (string) $title;
        
         /** @var \Comments\Entity\Comment */
-        $commentEntity = $this->getCommentMapper()->findBy('id', $commentId);
+        $commentEntity = $this->getCommentById($commentId);
         if (!$commentEntity) {
-            throw new Exception;
-        }
-        if(!is_object($user)|| !$this->hasPermission($commentEntity, $user)){
-            throwException('not the correct logged in user!!!!');
+            return false;
         }
         $commentEntity->setTitle($title);
         $commentEntity->setComment($comment);
         
-        return $this->getCommentMapper()->update($commentEntity);
+        try {
+            return $this->getCommentMapper()->update($commentEntity);    
+        } catch (\Exception $ex) {
+            return false;
+        }
+        
     }
     /**
      * 
-     * @param int $userId
-     * @param int $moduleId
-     * @param int $comment
-     * @return type
-     * @throws Exc
+     * @param int $commentId
+     * @return mixed false || object
      */
-    public function delete($userId, $moduleId, $commentId)
+    public function delete($commentId)
     {
-        $userId = (int) $userId;
-        $moduleId = (int) $moduleId;
         $commentId = (int) $commentId;
         
-        $commentEntity = $this->getCommentMapper()->find($commentId);
-        if(!$commentEntity){ 
-            throw new Exception;
+         /** @var \Comments\Entity\Comment */
+        $commentEntity = $this->getCommentById(commenttId);
+        if (!$commentEntity) {
+            return false;
         }
-       
-        return $this->getCommentMapper()->delete($commentEntity);
+    
+        try {
+            return $this->getCommentMapper()->delete($commentEntity);
+        } catch (\Exception $exc) {
+            return false;
+        }
     }
     public function close($commentId)
     {
         $commentId = (int) $commentId;
         
-        $commentEntity = $this->getCommentMapper()->find($commentId);
-        if(!$commentEntity){ 
-            throw new Exception;
+         /** @var \Comments\Entity\Comment */
+        $commentEntity = $this->getCommentById($commentId);
+        if (!$commentEntity) {
+            return false;
         }
        
-          $commentEntity->setIsClosed(1);
-          $this->getCommentMapper()->persist($commentEntity);
+        $commentEntity->setIsClosed(1);
+          
+        try {
+            $this->getCommentMapper()->insert($commentEntity);
+            return true;
+        } catch (\Exception $exc) {
+              return false;
+        }          
     }
    /**
     * 
     * @param int $moduleId
     * @return array array of comment objects
     */
+    public function getCommentById($commentId)
+    {
+        try{
+            $comment = $this->getCommentMapper()->findBy('id', $commentId);
+        } catch (\Exception $ex) { 
+            return false;
+        }
+        if (!$comment) {
+            return false;
+        }
+        return $comment[0];
+    }
+    /**
+    * 
+    * @param int $moduleId
+    * @return array array of comment objects
+    */
     public function commentsByModuleId($moduleId, $limit = 15, $sort = null, $order= null)
     {
-        return $this->getCommentMapper()->findParentsWhere('moduleId',$moduleId, $limit,  $sort, $order);
+        try {
+            return $this->getCommentMapper()->findParentsWhere('moduleId',$moduleId, $limit,  $sort, $order);
+        } catch (\Exception $ex) {
+            return false;
+        }                 
     }
 
     /**
@@ -187,22 +218,26 @@ class Comment {
      */
     public function getUserById($id)
     {
+        $em = $this->getEntityManager();
         $commentMapper = $this->getCommentMapper();
-        $em = $commentMapper->getEntityManager();
-        
-        return $em->find( $commentMapper->getUserEntityClass(), 
-                                  $id);
-    }
-
-    protected function hasPermission($commentEntity, $user)
-    {
-        $commentUser = $commentEntity->getUser();
-        $commentUserId = $commentUser->getId();
-        if($commentUserId === $user->getId()){
-            return true;
+        try{
+            return $em->find(
+                //@todo insert this info in service
+                $commentMapper->getUserEntityClass(), 
+                $id
+            );
+        } catch (\Exception $ex) {
+            return false;
         }
-        return false;
     }
- }
+    /*
+     * @todo do this in service
+     */
+    protected function getEntityManager()
+    {
+        $commentMapper = $this->getCommentMapper();
+        return $commentMapper->getEntityManager();
+    }
+}
 
 
