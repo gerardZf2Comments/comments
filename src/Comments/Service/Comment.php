@@ -46,17 +46,14 @@ class Comment {
         }
              
    }
-    public function addReply($user, $comment, $parentCommentId)
+    public function addReply($user, $comment, $parentId)
     {
-       
-        $parentCommentId = (int) $parentCommentId;
-        $comment = (string) $comment;      
         
         $commentMapper = $this->getCommentMapper();
         $em = $commentMapper->getEntityManager();
-        
+        //@todo - write something in case object isn't found 
         $parentComment = $em->find( $commentMapper->getCommentEntityClass(), 
-            $parentCommentId
+            $parentId
         );
         
         $moduleId = $parentComment->getModuleId();
@@ -167,15 +164,14 @@ class Comment {
     * @param int $moduleId
     * @return array array of comment objects
     */
-    public function commentsByModuleId($moduleId, $limit = 15, $sort = null, $order= null)
+    public function commentsById($type, $moduleId, $limit = 15, $sort = null, $order= null)
     {
         try {
-            return $this->getCommentMapper()->findParentsWhere('moduleId',$moduleId, $limit,  $sort, $order);
+            return $this->getCommentMapper($type)->findParentsWhere('moduleId',$moduleId, $limit,  $sort, $order);
         } catch (\Exception $ex) {
             return false;
-        }                 
+        }
     }
-
     /**
     * 
     * @return \Zend\ServiceManager\ServiceLocatorInterface
@@ -198,9 +194,9 @@ class Comment {
      * 
      * @return \Comments\Mapper\Comment
      */
-    public function getCommentMapper()
+    public function getCommentMapper($type)
     {
-        return $this->getServiceLocator()->get('comments_mapper_comment');
+        return $this->getServiceLocator()->get($this->config[$type]['mapper']);
         
     }
 

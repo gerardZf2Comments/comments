@@ -7,8 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
  *
  * @author gerard
  */
-class Comment 
+abstract class Comment 
 {
+
     /**
      * binary
      * @var int
@@ -28,7 +29,8 @@ class Comment
      *collection of \Comments\Entity\Comment
      * @var Doctrine\Common\Collections\ArrayCollection
      */
-    protected $children;
+   
+    protected $replies;
     /**
      * discription
      * @var int
@@ -48,7 +50,7 @@ class Comment
      *discription
      * @var string
      */
-    protected $comment;
+    protected $content;
     /*
      * @var int
      */
@@ -64,6 +66,7 @@ class Comment
      */
     public function __construct() {
         $this->children = new ArrayCollection;
+        $this->replies = new ArrayCollection;
         return $this;
     }
     /**
@@ -77,16 +80,18 @@ class Comment
      * collection or proxy
      * @return Doctrine\Common\Collections\ArrayCollection
      */
-    public function getChildren(){
-        return $this->children;
+    public function getReplies()
+    {
+        return $this->replies;
     }
     /**
      * collection or proxy
      * @param Doctrine\Common\Collections\ArrayCollection $children
      * @return \Comments\Entity\Comment
      */
-    public function setChildren($children){
-        $this->children = $children;
+    public function setReplies($children)
+    {
+        $this->replies = $replies;
         return $this;
     }
     /**
@@ -168,18 +173,18 @@ class Comment
      * get a set comment
      * @return string
      */
-    public function getComment()
+    public function getContent()
     {
-       return $this->comment;
+       return $this->content;
     }
     /**
      * set comment
      * @param string $comment
      * @return \Comments\Entity\Comment
      */
-    public function setComment($comment)
+    public function setContent($comment)
     {
-        $this->comment=$comment;
+        $this->content = $content;
         return $this;
     }
     /**

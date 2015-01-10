@@ -1,5 +1,30 @@
-<div class="reply-form-edit">
-    <?= $this->partial('comments/comment/form/reply.phtml', array(
-        'replyForm' => $this->replyForm,
-    )) ?>
-</div>
+
+    <?php
+
+$form = $this->replyForm;
+
+$parentId = $this->parentId;
+$form->setAttribute('action', $this->url("comment/add-reply"));
+$form->setAttribute('method', 'post');
+
+    $form->prepare();
+?>
+<form action="/comment/add-reply" method="post" class="reply-form-edit" data-id="<?= $form->get('id')->getValue(); ?>">
+    
+    <div class="element-wrapper">
+        <input type="hidden" name="parent-id" value="<?php echo $parentId ?>" >
+    </div><!-- end - class="input-wrapper"-->
+    
+     <div class="input-wrapper">
+        <?= $this->formRow($form->get('id')); ?>
+    </div><!-- end - class="input-wrapper"-->
+   
+    <div class="element-wrapper">
+        <?= $this->formRow($form->get('content')); ?>
+    </div><!-- end - class="input-wrapper"-->
+    
+    <div class="element-wrapper">
+         <?= $this->formSubmit($form->get('submit')); ?>
+    </div><!-- end - class="input-wrapper"-->
+
+</form>

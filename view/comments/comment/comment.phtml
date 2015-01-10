@@ -1,21 +1,60 @@
 <?php $allowEdit = $this->CurrentUserIsCommentOwner($comment); ?>
 
-<div class="comment-wrapper">
-    
-    <div class="comment-labels">
-    <div>
-        <span class="comment-discriptor-label"><?= $this->translate('Title') ?> : </span>
-        <span class="module-comments-title"><strong><?= $this->EscapeHtml($comment->getTitle()) ?></strong> </span>
-    </div>
-    <div> 
-        <span class="comment-discriptor-label"><?= $this->translate('Username') ?> : </span>
-        <span class="module-comments-username"><strong><?= $this->EscapeHtml($comment->getUser()->getUserName()) ?></strong> </span>
-        </div>
-        
+<div class="comment-wrapper" data-comment-id="<?= $comment->getId(); ?>">
+    <div class="comment-display">
+        <div class="comment-labels">
+            <div>
+                <span class="comment-label-name"><?= $this->translate('Title') ?> : </span>
+                <span class="comment-title"><strong><?= $this->EscapeHtml($comment->getTitle()) ?></strong> </span>
+            </div>
+            <div> 
+                 <span class="comment-label-name"><?= $this->translate('Username') ?> : </span>
+                 <span class=""><strong><?= $this->EscapeHtml($comment->getUser()->getUserName()) ?></strong> </span>
+            </div>
         </div><!-- comment-labels -->
+    
+    
+ 
+    <div class="comment-content">
+        <span class="module-comments-comment"><?= $this->EscapeHtml($comment->getContent()) ?> </span>
+    </div> 
+        </div>
+    <?php ////@todo - change this ?>
+    <?php if(!$allowEdit):?>
         <div>
+              <?= $this->CommentEditForm($comment); ?>
+        </div>
+    <?php endif; ?>
+        
+    <div class="replies-wrapper" parent-id="<?= $comment->getId() ?>">
+    
+        <div class="replies" >
+        <?php 
+        //loop the child comments 
+        foreach ($comment->getReplies() as $reply) {
+            echo $this->partial('comments/comment/reply.phtml', array('reply' => $reply));
+        }
+        ?>
+    </div><!-- end - class="replies"-->
+
+    </div><!-- end - class="replies-wrapper" -->
+    <hr>
+    <div class="comment-controls">
+    <span class="tog-vis-reply comment-button"><?= $this->translate('Show Replies') ?></span>
+    <span> || </span>
+    
+    <?php if (!$this->zfcUserIdentity()) { /* @todo - change */ ?>
+    <span class="reply-to-comment-button comment-button"><?= $this->translate('Reply') ?></span>
+    
+       
+    <?php } else { 
+    
+    echo $this->loginLink($this);
+        
+    } /* end else */  ?>
+    
         <?php
-            //todo- change this
+            //@todo- change this
             if(!$allowEdit):
         ?>
         
@@ -24,41 +63,13 @@
                     <?php if(!$allowEdit || $this->CurrentUserIsModuleOwner($comment)) : ?>
             <span class="comment-close-button comment-button">close</span>
             <?php endif; ?>
-        </div>
-    
- 
-    <div class="comment-content">
-        <span class="module-comments-comment"><?= $this->EscapeHtml($comment->getComment()) ?> </span>
-    </div> 
-    <?php //change this ?>
-    <?php if(!$allowEdit):?>
-        <div>
-            <?= $this->CommentEditForm($comment); ?>
-        </div>
-    <?php endif; ?>
-    <div class="child-comments-wrapper" parent-id="<?= $comment->getId() ?>">
-    <div class="child-comments" >
-        <?php 
-        //loop the child comments 
-        foreach ($comment->getChildren() as $childComment) {
-            echo $this->partial('comments/comment/child-comment.phtml', array('comment' => $childComment));
-        }
-        ?>
-    </div><!-- end - class="child-comments"-->
-
-    <span class="show-hide-child-comments-button comment-button"><?= $this->translate('Show Replies') ?></span>
-    <span> || </span>
-   
-    <?php if (!$this->zfcUserIdentity()) { ?>
-    <span class="reply-to-comment-button comment-button"><?= $this->translate('Reply') ?></span>
-    
-    <?=  $this->render($replyForm) ?>
-       
-    <?php } else { 
-    
-    echo $this->loginLink($this);
         
-    } // end else  ?>
     <hr>
-    </div><!-- end - class="child-comments-wrapper" -->
+     <?php if (!$this->zfcUserIdentity()) : /* @todo - change */ ?>
+   
+    
+    
+    </div>
+    <?=  $this->render($replyForm); ?>
+    <?php endif; ?>
 </div><!-- end - class="comment-wrapper" -->

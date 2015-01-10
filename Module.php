@@ -52,6 +52,7 @@ Class Module
             'comments_mapper_comment' => function ($sm) {
                     //todo - sort out some mod options
                     $options = new \Comments\Options\CommentOptions();
+                    
                     $options->setCommentEntityClassName('Comments\Entity\Comment');
                     $options->setUserEntityClassName('User\Entity\User');
                     return new \Comments\Mapper\Comment(
@@ -62,7 +63,9 @@ Class Module
                 'comments_service_comment' => function($sm) {
                     $service = new Service\Comment();
                     $service->setServiceLocator($sm);
-
+                    $config = $sm->get('Config');
+                    $config = $config['comments'];
+                    $service->config = $config;
                     return $service;
                 },
                                 // todo - complete refactor
@@ -72,7 +75,7 @@ Class Module
                     return $form;
                 },
                  'comments_form_comment_reply_form' => function($sm) {
-                    $form = new \Comments\Form\CommentReply();
+                    $form = new \Comments\Form\Reply();
 
                     return $form;
                 },
@@ -81,14 +84,14 @@ Class Module
                     $viewModel = new \Comments\View\Model\Comment\Reply();
                     $options = new \Comments\Options\CommentOptions();
                     // $template =  $options->getViewAddReplySuccessTemplateName();
-                    $template = 'comments/comment/child-comment';
+                    $template = 'comments/comment/reply';
                     $viewModel->setTemplate($template);
 
                     return $viewModel;
                 },
                     // todo - complete refactor
                 'comments_view_model_comment' => function($sm) {
-                    $replyFormView = $sm->get('comments_view_model_comment_reply_form');
+                    $replyFormView = $sm->get('comments_view_model_reply_form');
                     $vars = array('replyForm' => $replyFormView);
                     $viewModel = new \Comments\View\Model\Comment\Comment($vars);
                     
@@ -113,7 +116,7 @@ Class Module
                     return $viewModel;
                 },
                 // todo - complete refactor
-                'comments_view_model_comment_reply_form' => function($sm) {
+                'comments_view_model_reply_form' => function($sm) {
                     $viewModel = new \Zend\View\Model\ViewModel;
                     // $options = new \ZfModule\Options\ModuleOptions();
                     // $template =  $options->getViewAddSuccessTemplateName();
@@ -132,7 +135,7 @@ Class Module
             'factories' => array(
                 'Comments' => function ($sm) {
                     $commentForm = $sm->getServiceLocator()->get('comments_view_model_comment_form');
-                    $replyForm = $sm->getServiceLocator()->get('comments_view_model_comment_reply_form');
+                    $replyForm = $sm->getServiceLocator()->get('comments_view_model_reply_form');
                     
                     $service = $sm->getServiceLocator()->get('comments_service_comment');
                     $helper = new \Comments\View\Helper\Comments($commentForm, $replyForm, $service);

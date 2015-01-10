@@ -20,13 +20,6 @@ class CurrentUserIsCommentOwner extends AbstractHelper implements ServiceLocator
      */
     protected $serviceLocator;
 
-    /**
-     * 
-     * @param int $moduleId
-     * @param int $limit 
-     * @param string $order
-     * @param string $sort
-     */
     public function __invoke($comment)
     {   
         $user = $this->getView()->zfcUserIdentity();
@@ -35,8 +28,7 @@ class CurrentUserIsCommentOwner extends AbstractHelper implements ServiceLocator
         }
         $userId = $user->getId();
         $commentUserId = $comment->getUser()->getId();
-        if( $userId === $commentUserId)
-        {
+        if( $userId === $commentUserId) {
             return true;        
         }
         return false;

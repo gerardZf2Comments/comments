@@ -2,7 +2,7 @@
 
 namespace Comments\View\Helper\Form;
 
-use Comments\Form\Comment as Form;
+use Comments\Form\Comment\Edit as Form;
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Model\ViewModel;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
@@ -37,8 +37,8 @@ class CommentEdit extends AbstractHelper implements ServiceLocatorAwareInterface
         //
         $data=array(
             'id'=>$comment->getId(),
-            'module-id' => $comment->getModuleId(),
-            'comment' => $comment->getComment(),
+            'module-id' => $comment->getModule()->getId(),
+            'comment' => $comment->getContent(),
             'title' => $comment->getTitle(),
         );
         $form = new Form();

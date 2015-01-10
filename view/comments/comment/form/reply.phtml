@@ -8,18 +8,14 @@ $form->setAttribute('method', 'post');
 
 $form->prepare();
 ?>
-<form action="/comment/add-reply" method="post" class="reply-to-comment-form reply">
+<form action="/comment/add-reply" method="post" class="reply-form reply" >
     
     <div class="element-wrapper">
         <input type="hidden" name="parent-id" value="<?php $parentId ?>" >
     </div><!-- end - class="input-wrapper"-->
-    
-     <div class="input-wrapper">
-        <?= $this->formRow($form->get('id')); ?>
-    </div><!-- end - class="input-wrapper"-->
    
-    <div class="element-wrapper">
-        <?= $this->formRow($form->get('comment')); ?>
+    <div class="element-wrapper" required>
+        <?= $this->formRow($form->get('content')); ?>
     </div><!-- end - class="input-wrapper"-->
     
     <div class="element-wrapper">

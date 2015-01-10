@@ -11,8 +11,13 @@ use Zend\Stdlib\Hydrator\HydratorInterface;
  * comment mapper uses doctrine
  * @author gerard
  */
-class Comment
+abstract class Comment
 {
+    abstract protected function getRelatorField(); 
+    abstract protected function setRelatorField($rf);
+    abstract protected function getFkField();
+    abstract protected function setFkField($fk);
+    
     /**
      * to be set in factory
      * @var \Doctrine\ORM\EntityManager
@@ -25,6 +30,7 @@ class Comment
      * @var \Comments\Options\CommentOptions
      */
     protected $options;
+    
 
     /**
      * some params required
@@ -75,15 +81,7 @@ class Comment
        $this->em->flush();
     }
 
-    /**
-     * fire events for listeners
-     * @param  \Comments\Entity\Comment $entity
-     * @todo implement this
-     */
-    protected function postRead($result)
-    {
-      //  $this->getEventManager()->trigger('find', $this, array('entity' => $result));
-    }
+    
      /**
      * gotta format colums properly eg. "c.xgy, c.xxx"
      * @param string $columns
@@ -168,33 +166,26 @@ class Comment
     {
          /** @var qb Doctrine/ORM/QueryBuilder */
         $qb = $this->em->createQueryBuilder();
-       
-       $qb->add('select', 'c')
-                  ->add('from', "Comments\Entity\Comment c");
+        $entityName = $this->entityName;
+        $qb->add('select', 'c')
+           ->add('from', "$entityName c");
     
         if ($orderBy) {
             $qb->orderBy('c.'.$orderBy , $sort); 
         }
+        $relatorField = $this->getRelatorField();
+        $fkField = $this->getFkField();  
        
-       // $qb->where('c.'.$by .'= :id');
-       
+        $qb->join('c.'.$relatorField, 'r', $qb->expr()->eq('r.'.$fkField, 1));
         $qb->where('c.hasParent = 0');
-       
-        $where = $qb->expr()->andX(
-            $qb->expr()->eq('c.'.$where, ':id'),
-            $qb->expr()->eq('c.hasParent', 0)
-        );
-        $qb->add('where', $where);
-        $qb->setParameter('id', $id);
-       
+
         /** @var q \Doctrine\ORM\Query */
         $q = $qb->getQuery();
         if ($limit) {          
             $q->setMaxResults($limit);
         } 
         $result = $q->getResult();
-        $this->postRead($result);
-       
+
         return $result;
     }
     /**

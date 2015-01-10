@@ -5,7 +5,7 @@ namespace Comments\View\Helper\Form;
 
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Model\ViewModel;
-use Comments\Form\CommentReply as Form;
+use Comments\Form\Reply\Edit as Form;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 /**
@@ -51,8 +51,8 @@ class ReplyEdit extends AbstractHelper implements ServiceLocatorAwareInterface
     protected function prepareForm($reply)
     {
         $formData=array(
-            'parent-id' => $reply->getParent()->getId(),
-            'comment' => $reply->getComment(),
+            'parent-id' => $reply->getComment()->getId(),
+            'comment' => $reply->getContent(),
             'id'=> $reply->getId(),
         );
         $form = new Form();

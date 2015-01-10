@@ -9,7 +9,7 @@ use Zend\Validator\Digits;
  * form can display errors and valiadte comment input
  * @todo 
  */
-class CommentReply extends Form 
+class Reply extends Form 
 {
     /**
      * input filter
@@ -25,13 +25,7 @@ class CommentReply extends Form
         parent::__construct('comment-reply');
         
         $this->setInputFilter($this->getInputFilter()); 
-        $this->add(array(
-           'name' => 'id',
-           'type' => 'Zend\Form\Element\Hidden',
-            'attributes' => array(
-                'class'=>'comment-reply-id',
-            ),
-        ));
+        
         $this->add(array(
             'name' => 'parent-id',
             'type' => 'Zend\Form\Element\Hidden',
@@ -42,7 +36,7 @@ class CommentReply extends Form
         ));
        
         $this->add(array(
-            'name' => 'comment',
+            'name' => 'content',
             'type' => 'Zend\Form\Element\Text',
             'options' => array(
                 'label' => 'Comment',
@@ -74,7 +68,7 @@ class CommentReply extends Form
                 ),
             ));
             $inputFilter->add(array(
-                'name' => 'comment',
+                'name' => 'content',
                 'required' => true,
                 'filters' => array(
                     array('name' => 'StripTags'),
@@ -95,7 +89,7 @@ class CommentReply extends Form
      * instanciate and set max and min
      * @return \Zend\Validator\StringLength
      */
-    public function getCommentStringLengthValidator()
+    protected function getCommentStringLengthValidator()
     {
         $validator = new \Zend\Validator\StringLength();
         $validator->setEncoding('UTF-8');

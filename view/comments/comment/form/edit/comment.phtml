@@ -1,5 +1,25 @@
-<div class="comment-form-edit">
-        <?= $this->partial('comments/comment/form/comment.phtml', array(
-        'commentForm' => $this->commentForm,
-    )) ?>
-</div>
+<?php
+    $commentForm = $this->commentForm;
+    $commentForm->prepare();
+?>
+<form action="/comment/edit-reply" method="post"  class="comment comment-form-edit">
+
+    <div class="input-wrapper">
+        <?= $this->formRow($commentForm->get('module-id')); ?>
+    </div><!-- end - class="input-wrapper"-->
+    <div class="input-wrapper">
+        <?= $this->formRow($commentForm->get('id')); ?>
+    </div><!-- end - class="input-wrapper"-->
+   
+     <div class="element-wrapper">
+        <?= $this->formRow($commentForm->get('title')); ?>
+    </div><!-- end - class="input-wrapper"-->
+    <div class="element-wrapper">
+        <?= $this->formRow($commentForm->get('comment')); ?>
+    </div><!-- end - class="input-wrapper"-->
+    
+    <div class="element-wrapper">
+         <?= $this->formSubmit($commentForm->get('submit')); ?>
+    </div><!-- end - class="input-wrapper"-->
+
+</form>

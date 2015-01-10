@@ -1,0 +1,21 @@
+move files to other comp
+check controllers - use js and ajax to them
+check js functions work down through whole document
+create scheama for replies
+create reply mapper and entity
+create controller actions for replies - add, edit, delete
+test js for replies
+refactor js. no more traversing in  2 directions
+create edit forms - should have id as required as opposed to create
+
+bind event to elems for replacing elems and hiding showing etc.
+events bubble - asi functionality depends on node nesting
+handlers should logicaly stop prop
+18 or so calls to .parents should be removed
+
+
+**************************
+
+ui
+db
+services

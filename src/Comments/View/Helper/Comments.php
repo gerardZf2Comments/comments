@@ -41,15 +41,15 @@ class Comments extends AbstractHelper implements ServiceLocatorAwareInterface
      * @param string $order
      * @param string $sort
      */
-    public function __invoke($moduleId, $limit = 15, $order=null, $sort =null)
+    public function __invoke($type, $id, $limit = 15, $order=null, $sort =null)
     {        
         $service = $this->getCommentService();
-        $comments = $service->commentsByModuleId($moduleId, $limit, $sort, $order);
+        $comments = $service->commentsById($type, $id, $limit, $sort, $order);
         $commentForm = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_form');
-        $replyForm = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_reply_form');
+        $replyForm = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_reply_form');
          $vm = new ViewModel(array(
             'comments' => $comments,
-            'moduleId' => $moduleId,
+            'moduleId' => $id,
             'commentForm' => $this->commentForm,
             'replyForm' => $replyForm,
         ));
@@ -57,7 +57,7 @@ class Comments extends AbstractHelper implements ServiceLocatorAwareInterface
         $vm->setTemplate($this->viewTemplate);
         /////////////////////////////////
          
-        $commentForm->setVariable('moduleId', $moduleId);
+        $commentForm->setVariable('moduleId', $id);
         
         return $this->getView()->render($vm);
         //////////////////////////////////////

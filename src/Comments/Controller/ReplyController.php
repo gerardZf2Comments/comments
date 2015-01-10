@@ -29,16 +29,16 @@ class ReplyController extends AbstractActionController
         }
         list($user, $replyId, $parentId, $comment) = $this->replyParams();
         //@todo form move to helper 
-        $form = new \Comments\Form\CommentReply();
-        $formIsValid = $this->getReplyForm($this->replyParams())->isValid();
+        $form = $this->getForm($this->replyParams());
+        $formIsValid = $form->isValid();
        
         if (!$formIsValid) {
             
-           return $this->commentsRender()->replyValidationFailed($form);
+           return $this->commentsRender()->replyForm($form);
         } 
-                   
+        
         $service = $this->getServiceLocator()->get('comments_service_comment');
-        $success = $service->addReply($user, $comment, $parentCommentId);
+        $success = $service->addReply($user, $comment, $parentId);
         if ($success) {
                
             return $this->commentsRender()->reply($success, true);       
@@ -46,23 +46,8 @@ class ReplyController extends AbstractActionController
        
         $message = 'Reply not added';
            
-        throw new Exception\DomainException($message);      
+        throw new \Exception($message);      
     }
-    
-    /**
-     * array($userId, $parentCommentId, $comment);
-     * @return array
-     */
-    protected function replyParams()
-    {
-        $user = $this->zfcUserAuthentication()->getIdentity();
-        $parentId = $this->params()->fromPost('parent-id');
-        $id = $this->params()->fromPost('id');
-        $comment = $this->params()->fromPost('comment');  
-      
-        return array($user, $id, $parentId, $comment);
-    }
-
     
     /**
      * edit comment, user must be logged in
@@ -84,7 +69,7 @@ class ReplyController extends AbstractActionController
             //@todo write getEditForm
             $form = $this->getEditForm($this->replyParams());
             if ( !$form->isValid()) {
-                return $this->commentsRender()->editFormError($form);
+                return $this->commentsRender()->replyForm($form);
             }
             $service = $this->getServiceLocator()->get('comments_service_comment');
         
@@ -100,12 +85,36 @@ class ReplyController extends AbstractActionController
     
     protected function getEditForm($data) 
     {
-        $ass = [];
+        $ass = array();
         $ass['id'] = $data[1];
         $ass['parent-id'] = $data[2];
         $ass['comment'] = $data[3];
-        $form = new \Comments\Form\CommentReply;
-        $form->setData($data);
+        $form = new \Comments\Form\Reply\Edit;
+        $form->setData($ass);
         return $form;
+    }
+    protected function getForm($data) 
+    {
+        $ass = array();
+        $ass['id'] = $data[1];
+        $ass['parent-id'] = $data[2];
+        $ass['comment'] = $data[3];
+        $form = new \Comments\Form\Reply;
+        $form->setData($ass);
+        return $form;
+    }
+    
+    /**
+     * array($userId, $parentCommentId, $comment);
+     * @return array
+     */
+    protected function replyParams()
+    {
+        $user = $this->zfcUserAuthentication()->getIdentity();
+        $parentId = $this->params()->fromPost('parent-id');
+        $id = $this->params()->fromPost('id');
+        $comment = $this->params()->fromPost('comment');  
+      
+        return array($user, $id, $parentId, $comment);
     }
 }

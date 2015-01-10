@@ -5,14 +5,14 @@
   $commentForm = $this->commentForm;
   ?>
 
-<div id="module-comments-wrapper" module-id="<?=  $moduleId ?>"  class="block">
+<div id="comments-wrapper" data-module-id="<?=  $moduleId ?>"  class="block">
     
     <div class="row">
       
-        <span class="module-comments-title span4"><h4><?= $this->translate('Comments') ?></h4></span>
+        <span class="comments-title span4"><h4><?= $this->translate('Comments') ?></h4></span>
        
     </div><!-- end // class="row" -->
-    <div class="module-comment-container">
+    <div class="comments">
     <?php
     if (count($comments)) {
         //loop to display comments
@@ -31,10 +31,10 @@
         <?php } // - foreach ($comments as $key => $comment) { ?>
 
     <?php } else { // end - if (count($comments)){  ?> 
-        <span class="module-comments-no-comments"><?= $this->translate('Be the first') ?></span>
+        <span class="no-comments"><?= $this->translate('Be the first') ?></span>
 
     <?php } // end else   ?>
-        </div> <!-- end -  class="module-comment-container"-->
+        </div> <!-- end -  class="comments"-->
         <div class="add-new-comment-wrapper">
     <?php if ($this->zfcUserIdentity()) {  ?>
         <div class="add-new-comment-wrapper">
@@ -42,9 +42,10 @@
             <div class="new-comment-form-wrapper">
                 <?=  $this->render($commentForm) ?>
             </div>
-        
+        </div>
     <?php } else { ?>
         <?= $this->LoginLink($this,$this->translate('Login to add new comment')); ?>
     <?php } // end else ?>
+            
         </div><!-- end -class="add-new-comment-wrapper" -->
-</div><!-- end - id="module-comments-wrapper" -->
+</div><!-- end - id="comments-wrapper" -->

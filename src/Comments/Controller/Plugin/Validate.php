@@ -7,8 +7,6 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 use Zend\ServiceManager\ServiceManagerAwareInterface;
 use Zend\ServiceManager\ServiceManager;
 use ZfcUser\Authentication\Adapter\AdapterChain as AuthAdapter;
-#use Comments\Form\Comment as CommentForm;
-#use Comments\Form\CommentReply as ReplyForm;
 
 class Validate extends AbstractPlugin 
 implements ServiceManagerAwareInterface,

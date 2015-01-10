@@ -1,0 +1,30 @@
+<?php /** @todo-conditional logic to print edit form hidden with some css descriptors for the js */ ?>
+<?php $allowEdit = $this->CurrentUserIsCommentOwner($reply); ?>
+<div class="reply-wrapper">
+     <?php //@todo change this ?>
+    <?php if(!$allowEdit):?>
+        
+            <?= $this->ReplyEditForm($reply); ?>
+  
+    <?php endif; ?>
+    <div class="reply-labels">
+        <span class="module-comments-username">
+            <span class="comment-label-name"><?= $this->translate('Username') ?> : </span>
+            <strong><?= $this->EscapeHtml($reply->getUser()->getUserName()) ?> </strong>
+        </span>
+         
+       
+  
+    </div>
+    <div class="reply-content">
+        <span class="module-comments-comment"><?= $this->EscapeHtml($reply->getContent()) ?> </span>
+    </div>
+    <?php
+            //@todo change this
+            if(!$allowEdit):
+        ?>
+    <div>
+         <span class="reply-edit-button comment-button " data-id="<?= $reply->getId(); ?>">edit</span>
+    </div>
+      <?php endif; ?>
+</div><!-- end class="reply-wrapper" -->

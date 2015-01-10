@@ -9,8 +9,7 @@ use Zend\ServiceManager\ServiceManager;
 use ZfcUser\Authentication\Adapter\AdapterChain as AuthAdapter;
 
 use Zend\View\Model\ViewModel;
-#use Comments\Form\Comment as CommentForm;
-#use Comments\Form\CommentReply as ReplyForm;
+
 
 class Render extends AbstractPlugin 
 implements ServiceManagerAwareInterface,
@@ -25,10 +24,10 @@ implements ServiceManagerAwareInterface,
      * @param bool $terminal
      * @return Zend\View\Model\ViewModel
      */
-    public function AddReplyValidationFailed($form, $terminal=true)
+    public function replyForm($form, $terminal=true)
     {
-        $viewParams = array('replacementForm' => $form);
-        $view = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_reply_form');
+        $viewParams = array('replyForm' => $form);
+        $view = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_reply_form');
         $view->setVariables($viewParams);
         $view->setTerminal($terminal);
         
@@ -40,9 +39,9 @@ implements ServiceManagerAwareInterface,
      * @param boll $terminal
      * @return Zend\View\Model\ViewModel
      */
-    public function AddValidationFailed($form, $terminal=true)
+    public function commentForm($form, $terminal=true)
     {
-        $viewParams = array('replacementForm' => $form);
+        $viewParams = array('commentForm' => $form);
         $view = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_comment_form');
         $view->setVariables($viewParams);
         $view->setTerminal($terminal);
@@ -124,7 +123,7 @@ implements ServiceManagerAwareInterface,
      */
     public function Reply($result, $terminal=true)
     {        
-        $viewParams = array('comment' => $result);
+        $viewParams = array('reply' => $result);
         $view = $this->getServiceLocator()->getServiceLocator()->get('comments_view_model_reply');
         $view->setVariables($viewParams);
         $view->setTerminal($terminal);

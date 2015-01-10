@@ -9,13 +9,14 @@ use Zend\InputFilter\InputFilter;
  * form can display errors and valiadte comment input
  * @todo check if controllers want more elements for validation 
  */
-class Comment extends Form {
+ class Comment extends Form {
 
      /**
      * the input filter object
      * @var Zend\InputFilter\InputFilter
      */
     protected $inputFilter;
+    
     /**
       * set name and instanciate elements and input filter
      * @param string $name
